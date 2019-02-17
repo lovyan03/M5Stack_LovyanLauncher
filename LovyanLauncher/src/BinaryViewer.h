@@ -3,6 +3,7 @@
 
 #include <MenuCallBack.h>
 #include <SD.h>
+#include <esp_flash_partitions.h>
 
 class BinaryViewer : public MenuCallBack
 {
@@ -31,7 +32,7 @@ public:
       setupScrollArea(hHeader, hFooter);
       scroll(hHeader + (firstdisplayline % DISPLAYLINES) * 10);
       if (move == 1) {
-        drawData(((firstdisplayline-1) % DISPLAYLINES), (firstdisplayline + DISPLAYLINES) * 16);
+        drawData(((firstdisplayline-1) % DISPLAYLINES), (firstdisplayline-1+ DISPLAYLINES) * 16);
       } else {
         drawData((firstdisplayline % DISPLAYLINES), firstdisplayline * 16);
       }
@@ -72,12 +73,12 @@ private:
   {
     M5.Lcd.setCursor(0,30);
     M5.Lcd.setTextColor(0xFFE0, 0);
-    M5.Lcd.printf("%08X", firstdisplayline * 16);
+    M5.Lcd.printf("0x%08X", firstdisplayline * 16);
   }
   bool drawData(int line_y, int pos)
   {
     int y = line_y * 10 + hHeader;
-    uint8_t buf[16];
+    uint8_t buf[16] = {0};
     int len = getData(pos, buf);
     if (len < 16) {
       M5.Lcd.fillRect(len * 14, y, M5.Lcd.width(), 10, 0);
@@ -94,6 +95,8 @@ private:
       if (buf[x] > 0x20) {
         M5.Lcd.setCursor(224 + x * 6, y);
         M5.Lcd.write(buf[x]);
+      } else {
+        M5.Lcd.fillRect(224 + x * 6, y, 12, 8, 0);
       }
     }
     return true;
@@ -135,4 +138,53 @@ public:
   }
 };
 
+class BinaryViewerFlash : public BinaryViewer
+{
+  esp_partition_t partition;
+public:
+  bool setup() 
+  {
+    switch (menuItem->tag) {
+    case 0:
+      partition.address = ESP_BOOTLOADER_OFFSET;
+      partition.size = CONFIG_PARTITION_TABLE_OFFSET - ESP_BOOTLOADER_OFFSET;
+      strcpy(partition.label, "2nd boot loader");
+      partition.encrypted = false;
+      break;
+    case 1:
+      partition.address = CONFIG_PARTITION_TABLE_OFFSET;
+      partition.size = 4096;
+      strcpy(partition.label, "partition table");
+      partition.encrypted = false;
+      break;
+
+    default:
+      const esp_partition_t* p
+             (esp_partition_find_first( (esp_partition_type_t)(menuItem->tag >> 8)
+                                      , (esp_partition_subtype_t)(menuItem->tag & 0xFF)
+                                      , NULL)
+             );
+      if (p == NULL) return false;
+      partition = *p;
+    }
+
+    dataSize = partition.size;
+
+    M5.Lcd.setTextColor(0xFFFF);
+    for (int i = 1; i < 16; ++i) {
+      M5.Lcd.drawFastHLine(0, i, TFT_HEIGHT, (i << 12) | (i << 6));
+    }
+    M5.Lcd.drawString("FLASH BinaryViewer", 10, 0, 2);
+
+    M5.Lcd.drawString("0x" + String(partition.address, HEX) + ":" + partition.label + (partition.encrypted ? " encrypted" : ""), 0, 20, 1);
+
+    return BinaryViewer::setup();
+  }
+
+  virtual int getData(int pos, uint8_t* buf) {
+    if (pos >= partition.size) return 0;
+    if (!ESP.flashRead(partition.address + pos, (uint32_t*)buf, 16)) return 0;
+    return 16;
+  }
+};
 #endif

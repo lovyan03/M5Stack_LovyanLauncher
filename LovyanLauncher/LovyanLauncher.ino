@@ -7,7 +7,7 @@
 #include <MenuItemSPIFFS.h>
 #include <MenuItemWiFiClient.h>
 #include <Preferences.h>
-#include <esp_deep_sleep.h>
+#include <esp_sleep.h>
 
 #include "src/MenuItemSDUpdater.h"
 #include "src/HeaderSample.h"
@@ -151,8 +151,18 @@ void setup() {
                  , new MenuItem("FTP Server (SPIFFS)", CallBackExec<CBFTPserverSPIFFS>)
                  } )
                , new MenuItemSDUpdater("SD Updater")
-               , new MenuItemSD("SD Card", CallBackExec<BinaryViewerFS>)
-               , new MenuItemSPIFFS("SPIFFS", CallBackExec<BinaryViewerFS>)
+               , new MenuItemSD("SDCard Viewer", CallBackExec<BinaryViewerFS>)
+               , new MenuItemSPIFFS("SPIFFS Viewer", CallBackExec<BinaryViewerFS>)
+               , new MenuItem("FLASH Viewer", vmi
+                 { new MenuItem("2nd boot loader", 0,CallBackExec<BinaryViewerFlash>)
+                 , new MenuItem("partation table", 1,CallBackExec<BinaryViewerFlash>)
+                 , new MenuItem("nvs",         0x102,CallBackExec<BinaryViewerFlash>)
+                 , new MenuItem("otadata",     0x100,CallBackExec<BinaryViewerFlash>)
+                 , new MenuItem("app0",        0x010,CallBackExec<BinaryViewerFlash>)
+                 , new MenuItem("app1",        0x011,CallBackExec<BinaryViewerFlash>)
+                 , new MenuItem("eeprom",      0x199,CallBackExec<BinaryViewerFlash>)
+                 , new MenuItem("spiffs",      0x182,CallBackExec<BinaryViewerFlash>)
+                 } )
                , new MenuItem("DeepSleep", CallBackDeepSleep)
                } );
   treeView.begin();
