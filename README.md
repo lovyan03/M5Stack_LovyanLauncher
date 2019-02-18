@@ -5,7 +5,9 @@ M5Stack用 ランチャー by lovyan03
 
 ## Description
   
-以下のことが出来ます。  
+![image](https://github.com/lovyan03/M5Stack_LovyanLauncher/image/img_001.jpg)  
+  
+メニューを操作して、以下のことが出来ます。  
   
 * SD-Updater によるアプリケーション切替  
 * WiFi 接続設定および接続情報のPreferencesへの保存  
@@ -15,7 +17,10 @@ M5Stack用 ランチャー by lovyan03
 * FTPサーバによるSD/SPIFFSへのファイルアクセス  
 * バイナリビューアによるSD/SPIFFSのファイル内容表示  
 * DeepSleepコマンドによるスリープ(給電中でも可)  
-
+  
+実際の動きを以下のツイートの動画で見る事が出来ます。  
+![機能紹介](https://twitter.com/-/status/1096966245562212352)  
+![SD-Updater](https://twitter.com/-/status/1097126013295681537)  
 
 ## Usage
  `BtnA click` : フォーカスを親へ移動  Move focus to parent item.  
