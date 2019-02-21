@@ -21,7 +21,7 @@ void MenuItemSDUpdater::onEnter() {
         String name = file.name();
         int idx = name.lastIndexOf('.');
         String ext = name.substring(idx + 1);
-        if (ext == "bin") {
+        if (ext == "bin" && !name.startsWith("/.")) {
           name = name.substring(1, idx);
           mi = new MenuItemSDUpdater(name, name);
           addItem(mi);
@@ -48,7 +48,9 @@ void MenuItemSDUpdater::onFocus() {
 }
 
 void MenuItemSDUpdater::onDefocus() {
-  M5.Lcd.fillRect(200, 30, 120, 140, backgroundColor);
+  if (name != "") {
+    M5.Lcd.fillRect(200, 30, 120, 140, backgroundColor);
+  }
 }
 
 void MenuItemSDUpdater::onAfterDraw()

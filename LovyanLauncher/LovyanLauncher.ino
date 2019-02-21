@@ -63,23 +63,29 @@ void CallBackStyle(MenuItem* sender)
 {
   switch (sender->tag) {
   default: return;
-  case 1:
-    treeView.font = 1;
+  case 0:
+    treeView.setTextFont(1);
     treeView.itemHeight = 18;
     M5ButtonDrawer::height = 14;
-    M5ButtonDrawer::width = 64;
     osk.keyHeight = 14;
+    osk.setTextFont(1);
     break;
-  case 2:
-    treeView.font = 2;
+
+  case 1:
+    treeView.setTextFont(2);
     treeView.itemHeight = 20;
-    M5ButtonDrawer::height = 18;
-    M5ButtonDrawer::width = 80;
     osk.keyHeight = 18;
+    osk.setTextFont(2);
+    break;
+
+  case 2:
+    treeView.setFreeFont(&FreeSans9pt7b);
+    treeView.itemHeight = 24;
+    osk.keyHeight = 18;
+    osk.setTextFont(2);
     break;
   }
-  M5ButtonDrawer::font = treeView.font;
-  osk.font = treeView.font;
+  treeView.updateDest();
   M5.Lcd.fillRect(0, 218, M5.Lcd.width(), 22, 0);
 }
 
@@ -91,6 +97,14 @@ void CallBackWiFiDisconnect(MenuItem* sender)
 void CallBackDeepSleep(MenuItem* sender)
 {
    esp_deep_sleep_start();
+}
+
+void CallBackRollBack(MenuItem* sender)
+{
+  if( Update.canRollBack() )  {
+    Update.rollBack();
+    ESP.restart();
+  }
 }
 
 template <class T>
@@ -112,18 +126,17 @@ void setup() {
      ESP.restart();
   }
 
-  Preferences preferences;
-  preferences.begin("wifi-config");
-  WiFi.begin(preferences.getString("WIFI_SSID").c_str(), preferences.getString("WIFI_PASSWD").c_str());
-  preferences.end();
+  WiFi.begin();
+
+  M5ButtonDrawer::width = 106;
 
   treeView.clientRect.x = 2;
-  treeView.clientRect.y = 16;
+  treeView.clientRect.y = 18;
   treeView.clientRect.w = 196;
   treeView.clientRect.h = 200;
   treeView.itemWidth = 176;
-  treeView.itemHeight = 18;
-  treeView.font = 1;
+  treeView.itemHeight = 20;
+  treeView.setTextFont(2);
 
   treeView.useFACES       = true;
   treeView.useCardKB      = true;
@@ -132,12 +145,12 @@ void setup() {
   osk.useFACES       = true;
   osk.useCardKB      = true;
   osk.usePLUSEncoder = true;
-
   osk.useJoyStick    = true;
   treeView.setItems(vmi
                { new MenuItem("Style ", CallBackStyle, vmi
-                 { new MenuItem("Font 2", 2)
-                 , new MenuItem("Default", 1)
+                 { new MenuItem("FreeSans9pt7b", 2)
+                 , new MenuItem("Font 2" , 1)
+                 , new MenuItem("Font 1", 0)
                  } )
                , new MenuItem("WiFi ", vmi
                  { new MenuItemWiFiClient("WiFi Client", CallBackWiFiClient)
@@ -164,6 +177,7 @@ void setup() {
                  , new MenuItem("spiffs",      0x182,CallBackExec<BinaryViewerFlash>)
                  } )
                , new MenuItem("DeepSleep", CallBackDeepSleep)
+               , new MenuItem("OTA Rollback", CallBackRollBack)
                } );
   treeView.begin();
   drawFrame();

@@ -8,7 +8,10 @@ class MenuItemSDUpdater : public MenuItem {
 public:
   String name;
 
-  MenuItemSDUpdater(const String& titleStr, std::function<void(MenuItem*)>cb = NULL)
+  MenuItemSDUpdater(const String& titleStr, int tag = 0, std::function<void(MenuItem*)>cb = NULL)
+  : MenuItem(titleStr, tag, cb), name() {};
+
+  MenuItemSDUpdater(const String& titleStr, std::function<void(MenuItem*)>cb)
   : MenuItem(titleStr, cb), name() {};
 
   MenuItemSDUpdater(const String& t, const String& p)
