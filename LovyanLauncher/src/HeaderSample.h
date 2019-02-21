@@ -12,12 +12,12 @@ public:
 
   uint16_t colorFill = 0x630C;
   uint16_t colorFont = 0xffff;
-  uint8_t font = 1;
+  uint8_t font = 0;
 
   int drawStr(const String& src, int x)
   {
-    M5.Lcd.drawString(src,x,0,font);
-    return x + M5.Lcd.textWidth(src,font);
+    M5.Lcd.drawString(src, x, 0);
+    return x + M5.Lcd.textWidth(src);
   }
 
   String wifiStatus(wl_status_t src) {
@@ -36,6 +36,8 @@ public:
 
   void draw()
   {
+    M5.Lcd.setTextFont(0);
+    M5.Lcd.setTextFont(font);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setTextColor(colorFont, colorFill);
     M5.Lcd.drawFastHLine(0, 8, TFT_HEIGHT, 0xC618);
@@ -58,7 +60,6 @@ public:
         x = drawStr(" ", x);
       }
     }
-    M5.Lcd.setTextFont(font);
     M5.Lcd.setCursor(TFT_HEIGHT - 96, 0);
     M5.Lcd.printf("Free%7d Byte", esp_get_free_heap_size());
     M5.Lcd.fillRect(x, 0, TFT_HEIGHT - 96-x, 8, colorFill);
