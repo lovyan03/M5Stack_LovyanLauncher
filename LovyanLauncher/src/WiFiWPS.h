@@ -38,6 +38,8 @@ public:
 
   static void WiFiEvent(WiFiEvent_t event, system_event_info_t info){
     if (closing) return;
+    M5.Lcd.setTextFont(0);
+    M5.Lcd.setTextFont(2);
     switch(event){
       case SYSTEM_EVENT_STA_START:
         M5.Lcd.println("Station Mode Started");
@@ -46,6 +48,7 @@ public:
         M5.Lcd.println("\r\nConnected to :" + WiFi.SSID());
         M5.Lcd.print("Got IP: ");
         M5.Lcd.println(WiFi.localIP());
+        save();
         break;
       case SYSTEM_EVENT_STA_DISCONNECTED:
         M5.Lcd.println("Disconnected from station, attempting reconnection");
@@ -78,13 +81,15 @@ public:
   }
 
   wifi_event_id_t onevent = 0;
-  bool setup(){
+  bool setup() {
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
       M5.Lcd.drawFastHLine(0, i, TFT_HEIGHT, i << 1);
     }
     M5.Lcd.drawString("WiFi WPS Client (button mode)", 10, 0, 2);
 
+    M5.Lcd.setTextFont(0);
+    M5.Lcd.setTextFont(2);
     closing = false;
     WiFi.disconnect(true);
     delay(10);
@@ -94,6 +99,7 @@ public:
     WiFi.mode(WIFI_MODE_STA);
 
     wpsInitConfig();
+    esp_wifi_wps_disable();
     esp_wifi_wps_enable(&wps_config);
     esp_wifi_wps_start(0);
 
@@ -103,21 +109,7 @@ public:
   bool loop()
   {
     delay(100);
-
-    if (WiFi.status() == WL_CONNECTED) {
-      btnDrawer.setText(2, "Save");
-      if (M5.BtnC.wasReleased()) {
-        Preferences preferences;
-        preferences.begin("wifi-config");
-        preferences.putString("WIFI_SSID", WiFi.SSID());
-        preferences.putString("WIFI_PASSWD", WiFi.psk());
-        preferences.end();
-        M5.Lcd.println("preferences Saved.");
-        M5.Lcd.println("WIFI_SSID  : " + WiFi.SSID());
-      //M5.Lcd.println("WIFI_PASSWD : "+ WiFi.psk());
-      }
-    }
-    return !M5.BtnA.wasReleased();
+    return true;
   }
 
   void close()
@@ -129,6 +121,14 @@ public:
     delay(100);
   }
 private:
+  static void save()
+  {
+    Preferences preferences;
+    preferences.begin("wifi-config");
+    preferences.putString("WIFI_SSID", WiFi.SSID());
+    preferences.putString("WIFI_PASSWD", WiFi.psk());
+    preferences.end();
+  }
 };
 esp_wps_config_t WiFiWPS::wps_config;
 bool WiFiWPS::closing;

@@ -126,8 +126,6 @@ void setup() {
      ESP.restart();
   }
 
-  WiFi.begin();
-
   M5ButtonDrawer::width = 106;
 
   treeView.clientRect.x = 2;

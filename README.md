@@ -7,16 +7,17 @@ M5Stack用 ランチャー by lovyan03
   
 ![image](https://raw.githubusercontent.com/lovyan03/M5Stack_LovyanLauncher/master/image/img_001.jpg)
   
-メニューを操作して、以下のことが出来ます。  
+こんなことが出来ます。  
   
-* SD-Updater によるアプリケーション切替  
+* SD-Updater によるアプリケーション起動  
 * WiFi 接続設定および接続情報のPreferencesへの保存  
-     (AP一覧から選択接続およびWPS方式を利用した簡単接続)  
+     (AP一覧から選択接続およびWPSプッシュボタン方式接続)  
 * SystemInformation 各種情報の表示  
 * I2Cスキャナ(接続中のI2C機器のアドレス一覧の表示)  
 * FTPサーバによるSD/SPIFFSへのファイルアクセス  
-* バイナリビューアによるSD/SPIFFSのファイル内容表示  
+* バイナリビューアによるSD/SPIFFS/FLASHの内容表示  
 * DeepSleepコマンドによるスリープ(給電中でも可)  
+* OTA Rollbackによる別パテーションアプリの起動  
   
 実際の動きを以下のツイートの動画で見る事が出来ます。  
 [機能紹介](https://twitter.com/-/status/1096966245562212352)  
@@ -45,4 +46,4 @@ FACES/JoyStick/PLUSEncoder/CardKB にも対応しています。
 
 ## Author
 
-[lovyan03](https://twitter.com/lovyan03)  
+[lovyan03](https://twitter.com/lovyan03)
