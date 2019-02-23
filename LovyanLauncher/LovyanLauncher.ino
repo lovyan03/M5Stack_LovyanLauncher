@@ -17,6 +17,7 @@
 #include "src/BinaryViewer.h"
 #include "src/CBFTPserver.h"
 #include "src/CBFTPserverSPIFFS.h"
+#include "src/WiFiSetting.h"
 
 M5TreeView treeView;
 M5OnScreenKeyboard osk;
@@ -30,7 +31,7 @@ void drawFrame() {
   treeView.update(true);
 }
 
-void CallBackWiFiClient(MenuItem* sender)
+void callBackWiFiClient(MenuItem* sender)
 {
   MenuItemWiFiClient* mi = static_cast<MenuItemWiFiClient*>(sender);
   if (!mi) return;
@@ -59,9 +60,9 @@ void CallBackWiFiClient(MenuItem* sender)
   while (M5.BtnA.isPressed()) M5.update();
 }
 
-void CallBackStyle(MenuItem* sender)
+void setStyle(int tag)
 {
-  switch (sender->tag) {
+  switch (tag) {
   default: return;
   case 0:
     treeView.setTextFont(1);
@@ -89,17 +90,22 @@ void CallBackStyle(MenuItem* sender)
   M5.Lcd.fillRect(0, 218, M5.Lcd.width(), 22, 0);
 }
 
-void CallBackWiFiDisconnect(MenuItem* sender)
+void callBackStyle(MenuItem* sender)
+{
+  setStyle(sender->tag);
+}
+
+void callBackWiFiDisconnect(MenuItem* sender)
 {
   WiFi.disconnect(true);
 }
 
-void CallBackDeepSleep(MenuItem* sender)
+void callBackDeepSleep(MenuItem* sender)
 {
    esp_deep_sleep_start();
 }
 
-void CallBackRollBack(MenuItem* sender)
+void callBackRollBack(MenuItem* sender)
 {
   if( Update.canRollBack() )  {
     Update.rollBack();
@@ -108,7 +114,7 @@ void CallBackRollBack(MenuItem* sender)
 }
 
 template <class T>
-void CallBackExec(MenuItem* sender)
+void callBackExec(MenuItem* sender)
 {
   T menucallback;
   menucallback(sender);
@@ -125,6 +131,7 @@ void setup() {
      updateFromFS(SD);
      ESP.restart();
   }
+  setStyle(1);
 
   M5ButtonDrawer::width = 106;
 
@@ -133,8 +140,6 @@ void setup() {
   treeView.clientRect.w = 196;
   treeView.clientRect.h = 200;
   treeView.itemWidth = 176;
-  treeView.itemHeight = 20;
-  treeView.setTextFont(2);
 
   treeView.useFACES       = true;
   treeView.useCardKB      = true;
@@ -145,37 +150,38 @@ void setup() {
   osk.usePLUSEncoder = true;
   osk.useJoyStick    = true;
   treeView.setItems(vmi
-               { new MenuItem("Style ", CallBackStyle, vmi
+               { new MenuItem("Style ", callBackStyle, vmi
                  { new MenuItem("FreeSans9pt7b", 2)
                  , new MenuItem("Font 2" , 1)
                  , new MenuItem("Font 1", 0)
                  } )
                , new MenuItem("WiFi ", vmi
-                 { new MenuItemWiFiClient("WiFi Client", CallBackWiFiClient)
-                 , new MenuItem("WiFi WPS", CallBackExec<WiFiWPS>)
-                 , new MenuItem("WiFi Disconnect", CallBackWiFiDisconnect)
+                 { new MenuItemWiFiClient("WiFi Client", callBackWiFiClient)
+                 , new MenuItem("WiFi WPS", callBackExec<WiFiWPS>)
+                 , new MenuItem("WiFi Setting(AP&HTTP)", callBackExec<WiFiSetting>)
+                 , new MenuItem("WiFi Disconnect", callBackWiFiDisconnect)
                  } )
                , new MenuItem("Tools", vmi
-                 { new MenuItem("System Info", CallBackExec<SystemInfo>)
-                 , new MenuItem("I2C Scanner", I2CScanner())
-                 , new MenuItem("FTP Server (SDcard)", CallBackExec<CBFTPserver>)
-                 , new MenuItem("FTP Server (SPIFFS)", CallBackExec<CBFTPserverSPIFFS>)
+                 { new MenuItem("System Info", callBackExec<SystemInfo>)
+                 , new MenuItem("I2C Scanner", callBackExec<I2CScanner>)
+                 , new MenuItem("FTP Server (SDcard)", callBackExec<CBFTPserver>)
+                 , new MenuItem("FTP Server (SPIFFS)", callBackExec<CBFTPserverSPIFFS>)
                  } )
                , new MenuItemSDUpdater("SD Updater")
-               , new MenuItemSD("SDCard Viewer", CallBackExec<BinaryViewerFS>)
-               , new MenuItemSPIFFS("SPIFFS Viewer", CallBackExec<BinaryViewerFS>)
+               , new MenuItemSD(    "SDCard Viewer", callBackExec<BinaryViewerFS>)
+               , new MenuItemSPIFFS("SPIFFS Viewer", callBackExec<BinaryViewerFS>)
                , new MenuItem("FLASH Viewer", vmi
-                 { new MenuItem("2nd boot loader", 0,CallBackExec<BinaryViewerFlash>)
-                 , new MenuItem("partation table", 1,CallBackExec<BinaryViewerFlash>)
-                 , new MenuItem("nvs",         0x102,CallBackExec<BinaryViewerFlash>)
-                 , new MenuItem("otadata",     0x100,CallBackExec<BinaryViewerFlash>)
-                 , new MenuItem("app0",        0x010,CallBackExec<BinaryViewerFlash>)
-                 , new MenuItem("app1",        0x011,CallBackExec<BinaryViewerFlash>)
-                 , new MenuItem("eeprom",      0x199,CallBackExec<BinaryViewerFlash>)
-                 , new MenuItem("spiffs",      0x182,CallBackExec<BinaryViewerFlash>)
+                 { new MenuItem("2nd boot loader", 0, callBackExec<BinaryViewerFlash>)
+                 , new MenuItem("partation table", 1, callBackExec<BinaryViewerFlash>)
+                 , new MenuItem("nvs",         0x102, callBackExec<BinaryViewerFlash>)
+                 , new MenuItem("otadata",     0x100, callBackExec<BinaryViewerFlash>)
+                 , new MenuItem("app0",        0x010, callBackExec<BinaryViewerFlash>)
+                 , new MenuItem("app1",        0x011, callBackExec<BinaryViewerFlash>)
+                 , new MenuItem("eeprom",      0x199, callBackExec<BinaryViewerFlash>)
+                 , new MenuItem("spiffs",      0x182, callBackExec<BinaryViewerFlash>)
                  } )
-               , new MenuItem("DeepSleep", CallBackDeepSleep)
-               , new MenuItem("OTA Rollback", CallBackRollBack)
+               , new MenuItem("DeepSleep", callBackDeepSleep)
+               , new MenuItem("OTA Rollback", callBackRollBack)
                } );
   treeView.begin();
   drawFrame();
