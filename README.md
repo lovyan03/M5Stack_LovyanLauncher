@@ -22,6 +22,15 @@ M5Stack用 ランチャー by lovyan03
 実際の動きを以下のツイートの動画で見る事が出来ます。  
 [機能紹介](https://twitter.com/-/status/1096966245562212352)  
 [SD-Updater](https://twitter.com/-/status/1097126013295681537)  
+  
+また、本体側が対応していれば、USB接続中に画面左上に充電モードを表示します。(残量ではありません)  
+CC=定電流充電中  
+CV=定電圧充電中  
+FC=満充電  
+  
+充電初期はCC、一定量充電されるとCVに移行します。  
+詳細については検索エンジンで「 充電 CC CV 」などで調べてみてください。  
+[google](https://www.google.com/search?q=%E5%85%85%E9%9B%BB+CC+CV&tbm=isch)  
 
 ## Usage
  `BtnA click` : フォーカスを親へ移動  Move focus to parent item.  
