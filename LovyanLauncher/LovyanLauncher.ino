@@ -187,10 +187,11 @@ void setup() {
   drawFrame();
 }
 
+long loopcnt = 0;
 void loop() {
   treeView.update();
   if (treeView.isRedraw()) {
     drawFrame();
   }
-  header.draw();
+  if (0 == (++loopcnt & 0xf)) header.draw();
 }

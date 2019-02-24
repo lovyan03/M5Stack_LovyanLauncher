@@ -34,6 +34,17 @@ public:
     return "";
   }
 
+  uint8_t chgStatus()
+  {
+    uint8_t res = 0;
+    Wire.beginTransmission(0x75); // IP5306_ADDR
+    Wire.write(0x71);             // IP5306_REG_READ1
+    Wire.endTransmission(false);
+    if (Wire.requestFrom(0x75, 1)) { // IP5306_ADDR
+      res = Wire.read();
+    }
+    return res;
+  }
   void draw()
   {
     M5.Lcd.setTextFont(0);
@@ -43,6 +54,16 @@ public:
     M5.Lcd.drawFastHLine(0, 8, TFT_HEIGHT, 0xC618);
 
     int x = 0;
+
+    {
+      uint8_t bat = chgStatus();
+      if (     0x08 == (bat & 0x08)) { x = drawStr("FC ", x); }  // signal of end of charging
+      else if (0x80 == (bat & 0x80)) { x = drawStr("?? ", x); }  // (missing description in original document)
+      else if (0x60 == (bat & 0x60)) { x = drawStr("CV ", x); }  // Constant Voltage Charging
+      else if (0x40 == (bat & 0x40)) { x = drawStr("CC ", x); }  // Constant Current Charging
+      else if (0x20 == (bat & 0x20)) { x = drawStr("C ", x); }   // Charging
+      else if (0 != bat) { x = drawStr(String(bat, HEX), x); }
+    }
 
     wifi_mode_t mode;
     esp_wifi_get_mode(&mode);
