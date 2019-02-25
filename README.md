@@ -29,8 +29,7 @@ CV=定電圧充電中
 FC=満充電  
   
 充電初期はCC、一定量充電されるとCVに移行します。  
-詳細については検索エンジンで「 充電 CC CV 」などで調べてみてください。  
-[google](https://www.google.com/search?q=%E5%85%85%E9%9B%BB+CC+CV&tbm=isch)  
+詳細については検索エンジンで「 [充電 CC CV](https://www.google.com/search?q=%E5%85%85%E9%9B%BB+CC+CV&tbm=isch) 」などで調べてみてください。  
 
 ## Usage
  `BtnA click` : フォーカスを親へ移動  Move focus to parent item.  
