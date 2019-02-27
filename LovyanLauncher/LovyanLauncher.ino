@@ -5,6 +5,7 @@
 #include <M5OnScreenKeyboard.h> // https://github.com/lovyan03/M5Stack_OnScreenKeyboard/
 #include <MenuItemSD.h>
 #include <MenuItemSPIFFS.h>
+#include <MenuItemToggle.h>
 #include <MenuItemWiFiClient.h>
 #include <Preferences.h>
 #include <esp_sleep.h>
@@ -102,7 +103,35 @@ void callBackWiFiDisconnect(MenuItem* sender)
 
 void callBackDeepSleep(MenuItem* sender)
 {
-   esp_deep_sleep_start();
+  M5.Lcd.setBrightness(0);
+  M5.Lcd.sleep();
+  esp_deep_sleep_start();
+}
+
+uint8_t getIP5306REG(uint8_t reg)
+{
+  Wire.beginTransmission(0x75);
+  Wire.write(reg);
+  Wire.endTransmission();
+  if (Wire.requestFrom(0x75, 1)) {
+    return Wire.read();
+  }
+  return 0;
+}
+
+void setIP5306REG(uint8_t reg, uint8_t data)
+{
+  Wire.beginTransmission(0x75);
+  Wire.write(reg);
+  Wire.write(data);
+  Wire.endTransmission();
+}
+
+void callBackBatteryIP5306CTL0(MenuItem* sender)
+{
+  MenuItemToggle* mi((MenuItemToggle*)sender); 
+  uint8_t data = getIP5306REG(0);
+  setIP5306REG(0, mi->value ? (data | mi->tag) : (data & ~(mi->tag)));
 }
 
 void callBackRollBack(MenuItem* sender)
@@ -168,19 +197,25 @@ void setup() {
                  , new MenuItem("FTP Server (SPIFFS)", callBackExec<CBFTPserverSPIFFS>)
                  } )
                , new MenuItemSDUpdater("SD Updater")
-               , new MenuItemSD(    "SDCard Viewer", callBackExec<BinaryViewerFS>)
-               , new MenuItemSPIFFS("SPIFFS Viewer", callBackExec<BinaryViewerFS>)
-               , new MenuItem("FLASH Viewer", vmi
-                 { new MenuItem("2nd boot loader", 0, callBackExec<BinaryViewerFlash>)
-                 , new MenuItem("partation table", 1, callBackExec<BinaryViewerFlash>)
-                 , new MenuItem("nvs",         0x102, callBackExec<BinaryViewerFlash>)
-                 , new MenuItem("otadata",     0x100, callBackExec<BinaryViewerFlash>)
-                 , new MenuItem("app0",        0x010, callBackExec<BinaryViewerFlash>)
-                 , new MenuItem("app1",        0x011, callBackExec<BinaryViewerFlash>)
-                 , new MenuItem("eeprom",      0x199, callBackExec<BinaryViewerFlash>)
-                 , new MenuItem("spiffs",      0x182, callBackExec<BinaryViewerFlash>)
+               , new MenuItem("Binary Viewer", vmi
+                 { new MenuItemSD(    "SDCard", callBackExec<BinaryViewerFS>)
+                 , new MenuItemSPIFFS("SPIFFS", callBackExec<BinaryViewerFS>)
+                 , new MenuItem("FLASH", vmi
+                   { new MenuItem("2nd boot loader", 0, callBackExec<BinaryViewerFlash>)
+                   , new MenuItem("partation table", 1, callBackExec<BinaryViewerFlash>)
+                   , new MenuItem("nvs",         0x102, callBackExec<BinaryViewerFlash>)
+                   , new MenuItem("otadata",     0x100, callBackExec<BinaryViewerFlash>)
+                   , new MenuItem("app0",        0x010, callBackExec<BinaryViewerFlash>)
+                   , new MenuItem("app1",        0x011, callBackExec<BinaryViewerFlash>)
+                   , new MenuItem("eeprom",      0x199, callBackExec<BinaryViewerFlash>)
+                   , new MenuItem("spiffs",      0x182, callBackExec<BinaryViewerFlash>)
+                   } )
                  } )
-               , new MenuItem("DeepSleep", callBackDeepSleep)
+               , new MenuItem("Power", vmi
+                 { new MenuItemToggle("BatteryCharge" , getIP5306REG(0) & 0x10, 0x10, callBackBatteryIP5306CTL0)
+                 , new MenuItemToggle("BatteryOutput" , getIP5306REG(0) & 0x20, 0x20, callBackBatteryIP5306CTL0)
+                 , new MenuItem("DeepSleep", callBackDeepSleep)
+                 })
                , new MenuItem("OTA Rollback", callBackRollBack)
                } );
   treeView.begin();
