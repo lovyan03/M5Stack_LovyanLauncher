@@ -54,4 +54,4 @@ FACES/JoyStick/PLUSEncoder/CardKB にも対応しています。
 
 ## Author
 
-[lovyan03](https://twitter.com/lovyan03)  
+[lovyan03](https://twitter.com/lovyan03)
