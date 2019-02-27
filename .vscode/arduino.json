@@ -1,0 +1,7 @@
+{
+    "board": "esp32:esp32:m5stack-fire",
+    "configuration": "PSRAM=enabled,PartitionScheme=default,UploadSpeed=921600,DebugLevel=none",
+    "sketch": "LovyanLauncher/LovyanLauncher.ino",
+    "output": "../build",
+    "port": "/dev/cu.SLAB_USBtoUART"
+}

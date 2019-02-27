@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/Users/masatsune/Arduino/libraries/M5Stack/src",
+                "/Users/masatsune/Arduino/libraries/M5TreeView/src",
+                "/Users/masatsune/Arduino/libraries/M5OnScreenKeyboard/src",
+                "/Users/masatsune/Arduino/libraries/M5Stack-SD-Updater/src",
+                "/Users/masatsune/Library/Arduino15/packages/esp32/hardware/esp32/1.0.1/**",
+                "/Users/masatsune/Library/Arduino15/packages/esp32/tools/**"
+            ],
+            "defines": [
+                "DEBUG"
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "forcedInclude": [
+                "/Users/masatsune/Library/Arduino15/packages/esp32/hardware/esp32/1.0.1/cores/esp32/Arduino.h"
+            ]
+        }
+    ],
+    "version": 4
+}
