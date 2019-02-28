@@ -16,21 +16,26 @@ M5Stack用 ランチャー by lovyan03
 * I2Cスキャナ(接続中のI2C機器のアドレス一覧の表示)  
 * FTPサーバによるSD/SPIFFSへのファイルアクセス  
 * バイナリビューアによるSD/SPIFFS/FLASHの内容表示  
-* DeepSleepコマンドによるスリープ(給電中でも可)  
+* バッテリーの充電・給電のオン・オフ制御  
+* DeepSleepコマンドによるスリープ(USB接続中でもスリープ可)  
 * OTA Rollbackによる別パテーションアプリの起動  
   
 実際の動きを以下のツイートの動画で見る事が出来ます。  
-[機能紹介](https://twitter.com/-/status/1096966245562212352)  
-[SD-Updater](https://twitter.com/-/status/1097126013295681537)  
+[機能紹介](https://twitter.com/lovyan03/status/1096966245562212352)  
+[SD-Updater](https://twitter.com/lovyan03/status/1097126013295681537)  
   
-また、本体側が対応していれば、USB接続中に画面左上に充電モードを表示します。(残量ではありません)  
+※ バッテリー関係の機能は、I2Cスキャナで0x75に反応がある本体でのみ使用可能です。  
+USB接続中に画面左上に充電モードを表示します。(残量ではありません)  
 CC=定電流充電中  
 CV=定電圧充電中  
 FC=満充電  
   
 充電初期はCC、一定量充電されるとCVに移行します。  
 詳細については検索エンジンで「 [充電 CC CV](https://www.google.com/search?q=%E5%85%85%E9%9B%BB+CC+CV&tbm=isch) 」などで調べてみてください。  
-
+[CCからCVへの移行](https://twitter.com/lovyan03/status/1100380792029470720)  
+[バッテリ充電オフ](https://twitter.com/lovyan03/status/1100774010017656832)  
+※外部電源がない状況下で給電オフ機能を使ってしまった場合は、一度バッテリを取り外すことで復旧できます。  
+  
 ## Usage
  `BtnA click` : フォーカスを親へ移動  Move focus to parent item.  
  `BtnA hold`  : フォーカスを前へ移動  Move focus to the previous item.  
