@@ -39,8 +39,8 @@ public:
   {
     Wire.beginTransmission(addr);
     Wire.write(reg);
-    Wire.endTransmission(false);
-    if (Wire.requestFrom(addr, 1)) {
+    if (Wire.endTransmission(false) == 0
+     && Wire.requestFrom(addr, 1)) {
       *res = Wire.read();
       return true;
     }
@@ -68,27 +68,26 @@ public:
         else     {
           uint8_t r78;
           if (readReg(&r78, IP5306_ADDR, 0x78)) {
-            int w = (r78 == 0xF0) ? 0
-                  : (r78 == 0xE0) ? 1
+            r78 &= 0xF0;
+            int w = (r78 == 0xE0) ? 1
                   : (r78 == 0xC0) ? 3
                   : (r78 == 0x80) ? 5
                   : (r78 == 0x00) ? 7
-                  : -1;
-            if (w != -1) {
-              M5.Lcd.drawRect(x  , 0, 11, 7, colorFont);
-              M5.Lcd.drawRect(x+1, 1,  9, 5, colorFill);
-              M5.Lcd.drawFastHLine(x, 7, 12, colorFill);
-              M5.Lcd.drawFastVLine(x + 11, 0, 2, colorFill);
-              M5.Lcd.drawFastVLine(x + 11, 2, 3, colorFont);
-              M5.Lcd.drawFastVLine(x + 11, 5, 2, colorFill);
-              if (w) {
-                M5.Lcd.fillRect(x+2, 2, w, 3, colorFont);
-              }
-              if (w < 7) {
-                M5.Lcd.fillRect(x+2+w, 2, 7-w, 3, colorFill); 
-              }
-              x += 12;
+                  : 0;
+            M5.Lcd.drawRect(x+1, 1,  9, 5, colorFill);
+            M5.Lcd.drawFastHLine(x, 7, 12, colorFill);
+            M5.Lcd.drawFastVLine(x + 11, 0, 2, colorFill);
+            M5.Lcd.drawFastVLine(x + 11, 5, 2, colorFill);
+            if (w < 7) {
+              M5.Lcd.fillRect(x+2+w, 2, 7-w, 3, colorFill); 
             }
+            uint16_t color = (r78 == 0xF0) ? 0xF862 : colorFont;
+            M5.Lcd.drawFastVLine(x + 11, 2, 3, color);
+            M5.Lcd.drawRect(x  , 0, 11, 7, color);
+            if (w) {
+              M5.Lcd.fillRect(x+2, 2, w, 3, color);
+            }
+            x += 12;
           }
         }
         M5.Lcd.fillRect(x, 0, 4, 8, colorFill);

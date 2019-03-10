@@ -112,8 +112,8 @@ uint8_t getIP5306REG(uint8_t reg)
 {
   Wire.beginTransmission(0x75);
   Wire.write(reg);
-  Wire.endTransmission();
-  if (Wire.requestFrom(0x75, 1)) {
+  if (Wire.endTransmission(false) == 0
+   && Wire.requestFrom(0x75, 1)) {
     return Wire.read();
   }
   return 0;
