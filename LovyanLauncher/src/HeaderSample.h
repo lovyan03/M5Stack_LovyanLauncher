@@ -57,37 +57,38 @@ public:
     int x = 0;
 
     {
-      uint8_t r78;
-      if (readReg(&r78, IP5306_ADDR, 0x78)) {
-        int w = (r78 == 0xF0) ? 0
-              : (r78 == 0xE0) ? 1
-              : (r78 == 0xC0) ? 3
-              : (r78 == 0x80) ? 5
-              : (r78 == 0x00) ? 7
-              : -1;
-        if (w != -1) {
-          M5.Lcd.drawRect(x  , 0, 11, 7, colorFont);
-          M5.Lcd.drawFastHLine(x, 7, 12, colorFill);
-          M5.Lcd.drawFastVLine(x + 12, 0, 8, colorFill);
-          M5.Lcd.drawFastVLine(x + 11, 0, 2, colorFill);
-          M5.Lcd.drawFastVLine(x + 11, 2, 3, colorFont);
-          M5.Lcd.drawFastVLine(x + 11, 5, 2, colorFill);
-          if (w) {
-            M5.Lcd.fillRect(x+2, 2, w, 3, colorFont);
-          }
-          x += 13;
-        }
-      }
-    }
-    {
       uint8_t r71; 
       if (readReg(&r71, IP5306_ADDR, 0x71)) {
-        if (     0x08 == (r71 & 0x08)) { x = drawStr("FC ", x); }  // signal of end of charging
-        else if (0x80 == (r71 & 0x80)) { x = drawStr("?? ", x); }  // (missing description in original document)
-        else if (0x60 == (r71 & 0x60)) { x = drawStr("CV ", x); }  // Constant Voltage Charging
-        else if (0x40 == (r71 & 0x40)) { x = drawStr("CC ", x); }  // Constant Current Charging
+        if (     0x08 == (r71 & 0x08)) { x = drawStr("FC", x); }  // signal of end of charging
+        else if (0x80 == (r71 & 0x80)) { x = drawStr("??", x); }  // (missing description in original document)
+        else if (0x60 == (r71 & 0x60)) { x = drawStr("CV", x); }  // Constant Voltage Charging
+        else if (0x40 == (r71 & 0x40)) { x = drawStr("CC", x); }  // Constant Current Charging
         else if (0x20 == (r71 & 0x20)) { x = drawStr("C ", x); }   // Charging
         else if (0 != r71) { x = drawStr(String(r71, HEX), x); }
+        else     {
+          uint8_t r78;
+          if (readReg(&r78, IP5306_ADDR, 0x78)) {
+            int w = (r78 == 0xF0) ? 0
+                  : (r78 == 0xE0) ? 1
+                  : (r78 == 0xC0) ? 3
+                  : (r78 == 0x80) ? 5
+                  : (r78 == 0x00) ? 7
+                  : -1;
+            if (w != -1) {
+              M5.Lcd.drawRect(x  , 0, 11, 7, colorFont);
+              M5.Lcd.drawFastHLine(x, 7, 12, colorFill);
+              M5.Lcd.drawFastVLine(x + 11, 0, 2, colorFill);
+              M5.Lcd.drawFastVLine(x + 11, 2, 3, colorFont);
+              M5.Lcd.drawFastVLine(x + 11, 5, 2, colorFill);
+              if (w) {
+                M5.Lcd.fillRect(x+2, 2, w, 3, colorFont);
+              }
+              x += 12;
+            }
+          }
+        }
+        M5.Lcd.fillRect(x, 0, 4, 8, colorFill);
+        x += 4;
       }
     }
 
