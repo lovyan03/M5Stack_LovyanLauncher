@@ -76,12 +76,16 @@ public:
                   : -1;
             if (w != -1) {
               M5.Lcd.drawRect(x  , 0, 11, 7, colorFont);
+              M5.Lcd.drawRect(x+1, 1,  9, 5, colorFill);
               M5.Lcd.drawFastHLine(x, 7, 12, colorFill);
               M5.Lcd.drawFastVLine(x + 11, 0, 2, colorFill);
               M5.Lcd.drawFastVLine(x + 11, 2, 3, colorFont);
               M5.Lcd.drawFastVLine(x + 11, 5, 2, colorFill);
               if (w) {
                 M5.Lcd.fillRect(x+2, 2, w, 3, colorFont);
+              }
+              if (w < 7) {
+                M5.Lcd.fillRect(x+2+w, 2, 7-w, 3, colorFill); 
               }
               x += 12;
             }
