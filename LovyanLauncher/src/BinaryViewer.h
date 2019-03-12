@@ -14,10 +14,9 @@ public:
     for (int i = 0; i < DISPLAYLINES; ++i) {
       drawData(i, i * 16);
     }
-    M5.Lcd.setCursor(224,30);
-    M5.Lcd.setTextColor(0xFFFF, 0);
-    M5.Lcd.printf("size:% 9d", dataSize);
     drawAddress();
+    M5.Lcd.setCursor(224,40);
+    M5.Lcd.printf("size:% 9d", dataSize);
     btnDrawer.setText(0, "Back/Up");
     btnDrawer.setText(2, "Down");
     return true;
