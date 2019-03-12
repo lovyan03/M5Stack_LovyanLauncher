@@ -103,7 +103,10 @@ void Header::draw()
       x = drawStr(" ", x);
     }
   }
+  int16_t cx = M5.Lcd.getCursorX();
+  int16_t cy = M5.Lcd.getCursorY();
   M5.Lcd.setCursor(TFT_HEIGHT - 96, 0);
   M5.Lcd.printf("Free%7d Byte", esp_get_free_heap_size());
   M5.Lcd.fillRect(x, 0, TFT_HEIGHT - 96-x, 8, colorFill);
+  M5.Lcd.setCursor(cx, cy);
 }

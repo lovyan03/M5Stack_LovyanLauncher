@@ -111,6 +111,8 @@ public:
   bool loop()
   {
     header.draw();
+    M5.Lcd.setTextFont(0);
+    M5.Lcd.setTextColor(0xFFFF);
     delay(100);
     return true;
   }
