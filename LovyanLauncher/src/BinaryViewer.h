@@ -2,6 +2,7 @@
 #define _BINARYVIEWER_H_
 
 #include <MenuCallBack.h>
+#include "Header.h"
 #include <SD.h>
 #include <esp_flash_partitions.h>
 
@@ -39,6 +40,7 @@ public:
       drawAddress();
     } else {
       delay(10);
+      header.draw();
     }
     return true;
   }
@@ -48,9 +50,9 @@ public:
 
 protected:
   int dataSize;
-  const int DISPLAYLINES = 18;
+  const int DISPLAYLINES = 17;
   int firstdisplayline = 0;
-  int hHeader = 40;
+  int hHeader = 50;
   int hFooter = 20;
 
   virtual int getData(int pos, uint8_t* buf) { return false; }
@@ -71,7 +73,7 @@ private:
   }
   bool drawAddress()
   {
-    M5.Lcd.setCursor(0,30);
+    M5.Lcd.setCursor(0,40);
     M5.Lcd.setTextColor(0xFFE0, 0);
     M5.Lcd.printf("0x%08X", firstdisplayline * 16);
   }
@@ -119,11 +121,11 @@ public:
     dataSize = file.size();
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
-      M5.Lcd.drawFastHLine(0, i, TFT_HEIGHT, (&fs == &SD) ? (i << 1) : (i << 6));
+      M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), (&fs == &SD) ? (i << 1) : (i << 6));
     }
-    M5.Lcd.drawString(String((&fs == &SD) ? "SD" : "SPIFFS") + " FileBinaryViewer", 10, 0, 2);
+    M5.Lcd.drawString(String((&fs == &SD) ? "SD" : "SPIFFS") + " FileBinaryViewer", 10, 10, 2);
 
-    M5.Lcd.drawString(mi->path, 0, 20, 1);
+    M5.Lcd.drawString(mi->path, 0, 30, 1);
 
     return BinaryViewer::setup();
   }
@@ -172,11 +174,11 @@ public:
 
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
-      M5.Lcd.drawFastHLine(0, i, TFT_HEIGHT, (i << 12) | (i << 6));
+      M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), (i << 12) | (i << 6));
     }
-    M5.Lcd.drawString("FLASH BinaryViewer", 10, 0, 2);
+    M5.Lcd.drawString("FLASH BinaryViewer", 10, 10, 2);
 
-    M5.Lcd.drawString("0x" + String(partition.address, HEX) + ":" + partition.label + (partition.encrypted ? " encrypted" : ""), 0, 20, 1);
+    M5.Lcd.drawString("0x" + String(partition.address, HEX) + ":" + partition.label + (partition.encrypted ? " encrypted" : ""), 0, 30, 1);
 
     return BinaryViewer::setup();
   }

@@ -2,6 +2,7 @@
 #define _WIFIWPS_H_
 
 #include <WiFi.h>
+#include "header.h"
 #include <esp_wps.h>
 #include <Preferences.h>
 #include <MenuCallBack.h>
@@ -82,18 +83,19 @@ public:
 
   wifi_event_id_t onevent = 0;
   bool setup() {
+    header.draw();
+    M5.Lcd.setTextFont(0);
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
-      M5.Lcd.drawFastHLine(0, i, TFT_HEIGHT, i << 1);
+      M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << 1);
     }
-    M5.Lcd.drawString("WiFi WPS Client (button mode)", 10, 0, 2);
+    M5.Lcd.drawString("WiFi WPS Client (button mode)", 10, 10, 2);
 
-    M5.Lcd.setTextFont(0);
-    M5.Lcd.setTextFont(2);
     closing = false;
     WiFi.disconnect(true);
     delay(10);
-    M5.Lcd.setCursor(0,40);
+    M5.Lcd.setCursor(0,50);
+    M5.Lcd.setTextFont(2);
     M5.Lcd.println("Starting WPS");
     onevent = WiFi.onEvent(WiFiEvent);
     WiFi.mode(WIFI_MODE_STA);
@@ -108,6 +110,7 @@ public:
 
   bool loop()
   {
+    header.draw();
     delay(100);
     return true;
   }

@@ -11,7 +11,7 @@
 #include <esp_sleep.h>
 
 #include "src/MenuItemSDUpdater.h"
-#include "src/HeaderSample.h"
+#include "src/Header.h"
 #include "src/SystemInfo.h"
 #include "src/I2CScanner.h"
 #include "src/WiFiWPS.h"
@@ -22,7 +22,6 @@
 
 M5TreeView treeView;
 M5OnScreenKeyboard osk;
-HeaderSample header;
 
 void drawFrame() {
   Rect16 r = treeView.clientRect;
@@ -214,6 +213,7 @@ void setup() {
                , new MenuItem("Power", vmi
                  { new MenuItemToggle("BatteryCharge" , getIP5306REG(0) & 0x10, 0x10, callBackBatteryIP5306CTL0)
                  , new MenuItemToggle("BatteryOutput" , getIP5306REG(0) & 0x20, 0x20, callBackBatteryIP5306CTL0)
+                 , new MenuItemToggle("Boot on load"  , getIP5306REG(0) & 0x04, 0x04, callBackBatteryIP5306CTL0)
                  , new MenuItem("DeepSleep", callBackDeepSleep)
                  })
                , new MenuItem("OTA Rollback", callBackRollBack)

@@ -1,4 +1,5 @@
-#include <M5Stack.h>
+#include <MenuCallBack.h>
+#include "header.h"
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiClient.h>
@@ -9,16 +10,17 @@ class WiFiSetting : public MenuCallBack
 {
 public:
   bool setup() {
+    header.draw();
     M5.Lcd.setTextFont(0);
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
-      M5.Lcd.drawFastHLine(0, i, TFT_HEIGHT, i << 12);
+      M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << 12);
     }
-    M5.Lcd.drawString("WiFi Setting HTTP Server", 10, 0, 2);
+    M5.Lcd.drawString("WiFi Setting HTTP Server", 10, 10, 2);
 
     preferences.begin("wifi-config");
 
-    M5.Lcd.setCursor(0,30);
+    M5.Lcd.setCursor(0,50);
     M5.Lcd.setTextFont(2);
     M5.Lcd.print("Starting Web Server...");
 
@@ -27,6 +29,7 @@ public:
   }
 
   bool loop() {
+    if (!(++counter & 0xF)) header.draw();
     webServer.handleClient();
     return true;
   }
@@ -43,6 +46,8 @@ public:
   , webServer(80)
   {}
 private:
+  long counter = 0;
+
   const IPAddress apIP;
   const char* apSSID;
   String ssidList;

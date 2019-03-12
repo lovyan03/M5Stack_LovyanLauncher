@@ -2,6 +2,7 @@
 #define _SYSTEMINFO_H_
 
 #include <MenuCallBack.h>
+#include "Header.h"
 #include <M5PLUSEncoder.h>
 #include <M5JoyStick.h>
 #include <nvs.h>
@@ -19,6 +20,7 @@ public:
 
   bool loop()
   {
+    header.draw();
     if (cmd == M5TreeView::eCmd::NEXT || cmd == M5TreeView::eCmd::PREV) {
       page = ++page % pageCount;
       drawPage(page);
@@ -30,11 +32,10 @@ public:
 private:
   int page;
   const int pageCount = 2;
-  void header(const char* title) {
-    int16_t y = M5.Lcd.getCursorY();
-    y = y ? y + 10:0;
+  void title(const char* title) {
+    int16_t y = M5.Lcd.getCursorY() + 10;
     for (int i = 1; i < 16; ++i) {
-      M5.Lcd.drawFastHLine(0, y + i, TFT_HEIGHT, i << 1);
+      M5.Lcd.drawFastHLine(0, y + i, M5.Lcd.width(), i << 1);
     }
     M5.Lcd.drawString(title, 10, y, 2);
     M5.Lcd.setCursor(0, y + 14);
@@ -59,7 +60,7 @@ private:
     M5.Lcd.setTextFont(1);
     switch (page) {
     case 0:
-      header("System Information");
+      title("System Information");
       uint64_t chipid;
       chipid=ESP.getEfuseMac();//The chip ID is essentially its MAC address(length: 6 bytes).
       esp_chip_info_t chip_info;
@@ -72,7 +73,7 @@ private:
       print("Flash Chip Size", "%d Byte", ESP.getFlashChipSize());
       print("ESP-IDF version", "%s",    esp_get_idf_version());
 
-      header("Mac Address");
+      title("Mac Address");
       uint8_t mac[6];
       esp_base_mac_addr_get(mac);            print("Base Mac Address");printMac(mac);
       esp_efuse_mac_get_default(mac);        print("Default");printMac(mac);
@@ -83,13 +84,13 @@ private:
       break;
 
     case 1:
-      header("Memory");
+      title("Memory");
       print("Total Heap Size"  , "%7d Byte", ESP.getHeapSize());
       print("Total PSRAM Size" , "%7d Byte", ESP.getPsramSize());
       print("Free Heap Size"   , "%7d Byte", esp_get_free_heap_size());
       print("Minimum Free Heap", "%7d Byte", esp_get_minimum_free_heap_size());
 
-      header("NVS (Preferences)");
+      title("NVS (Preferences)");
       nvs_stats_t nvs_stats;
       nvs_get_stats(NULL, &nvs_stats);
       print("Used Entries"   ,"%4d", nvs_stats.used_entries   );
@@ -97,7 +98,7 @@ private:
       print("Total Entries"  ,"%4d", nvs_stats.total_entries  );
       print("Namespace Count","%4d", nvs_stats.namespace_count);
 
-      header("WiFi");
+      title("WiFi");
       print("IP Addr"); M5.Lcd.println(WiFi.localIP().toString());
       print("Subnet");  M5.Lcd.println(WiFi.subnetMask().toString());
       print("SSID");    M5.Lcd.println(WiFi.SSID());

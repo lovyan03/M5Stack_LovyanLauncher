@@ -2,6 +2,7 @@
 #define _I2CSCANNER_H_
 
 #include <MenuCallBack.h>
+#include "Header.h"
 
 class I2CScanner : public MenuCallBack
 {
@@ -10,20 +11,21 @@ public:
   {
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
-      M5.Lcd.drawFastHLine(0, i, TFT_HEIGHT, i << 1);
+      M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << 1);
     }
-    M5.Lcd.drawString("I2C Scanner", 10, 0, 2);
+    M5.Lcd.drawString("I2C Scanner", 10, 10, 2);
     return true;
   }
   bool loop()
   {
+    header.draw();
     M5.Lcd.setTextFont(1);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setTextColor(0xFFFF, 0);
     byte dummy = 0;
     for (byte adr = 0; adr <= 0x7F; adr++) {
       int x = (adr % 16) * 20;
-      int y = 20 + (adr / 16) * 20;
+      int y = 40 + (adr / 16) * 20;
       M5.Lcd.setCursor(4 + x, 6 + y);
       Wire.beginTransmission(adr);
       Wire.write(&dummy, 0);

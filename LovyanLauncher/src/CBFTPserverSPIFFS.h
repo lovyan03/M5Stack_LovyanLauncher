@@ -2,6 +2,7 @@
 #define _CBFTPSERVERSPIFFS_H_
 
 #include <MenuCallBack.h>
+#include "Header.h"
 #include "ESP32FtpServer.h"
 #include <SPIFFS.h>
 
@@ -15,9 +16,9 @@ public:
     me = this;
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
-      M5.Lcd.drawFastHLine(0, i, TFT_HEIGHT, i << 6);
+      M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << 6);
     }
-    M5.Lcd.drawString("FTP Server (SPIFFS)", 10, 0, 2);
+    M5.Lcd.drawString("FTP Server (SPIFFS)", 10, 10, 2);
 
     SPIFFS.begin();
     closing = false;
@@ -35,7 +36,7 @@ public:
   bool loop()
   {
     ftpSrv.handleFTP();
-
+    if (!(++counter & 0xF)) header.draw();
     return true;
   }
 
@@ -47,6 +48,7 @@ public:
   }
 
 private:
+  long counter = 0;
   wifi_event_id_t onevent = 0;
   static CBFTPserverSPIFFS* me;
   static bool closing;
