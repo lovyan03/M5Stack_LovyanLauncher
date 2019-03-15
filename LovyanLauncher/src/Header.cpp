@@ -5,15 +5,15 @@
 
 #include "Header.h"
 
-Header header;
+HeaderDrawer Header;
 
-int Header::drawStr(const String& src, int x)
+int HeaderDrawer::drawStr(const String& src, int x)
 {
   M5.Lcd.drawString(src, x, 0);
   return x + M5.Lcd.textWidth(src);
 }
 
-String Header::wifiStatus(wl_status_t src) {
+String HeaderDrawer::wifiStatus(wl_status_t src) {
   switch (src)
   {
   case WL_IDLE_STATUS    : return "IDLE_STATUS";
@@ -27,18 +27,18 @@ String Header::wifiStatus(wl_status_t src) {
   return "";
 }
 
-bool Header::readReg(uint8_t* res, uint8_t addr, uint8_t reg)
+bool HeaderDrawer::readReg(uint8_t* res, uint8_t addr, uint8_t reg)
 {
   Wire.beginTransmission(addr);
   Wire.write(reg);
   if (Wire.endTransmission(false) == 0
-   && Wire.requestFrom(addr, 1)) {
+   && Wire.requestFrom(addr, (uint8_t)1)) {
     *res = Wire.read();
     return true;
   }
   return false;
 }
-void Header::draw()
+void HeaderDrawer::draw()
 {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextFont(font);

@@ -1,9 +1,9 @@
 #ifndef _HEADER_H_
 #define _HEADER_H_
 
-class Header {
+class HeaderDrawer {
 public:
-  Header() {};
+  HeaderDrawer() {};
 
   uint16_t colorFill = 0x630C;
   uint16_t colorFont = 0xffff;
@@ -17,6 +17,6 @@ private:
   const uint8_t IP5306_ADDR = 0x75;
 };
 
-extern Header header;
+extern HeaderDrawer Header;
 
 #endif

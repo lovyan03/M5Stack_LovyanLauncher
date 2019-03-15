@@ -20,7 +20,7 @@ public:
 
   bool loop()
   {
-    header.draw();
+    Header.draw();
     if (cmd == M5TreeView::eCmd::NEXT || cmd == M5TreeView::eCmd::PREV) {
       page = ++page % pageCount;
       drawPage(page);
@@ -53,7 +53,7 @@ private:
     M5.Lcd.setCursor(0, M5.Lcd.getCursorY() + 8);
   }
   void drawPage(int page) {
-    M5.Lcd.fillRect(0, 0, M5.Lcd.width(), M5.Lcd.height() - 14, 0);
+    M5.Lcd.fillRect(0, 10, M5.Lcd.width(), M5.Lcd.height() - 30, 0);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setTextColor(0xffff);
     M5.Lcd.setCursor(0,0);

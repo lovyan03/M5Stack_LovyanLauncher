@@ -17,7 +17,7 @@ public:
     drawAddress();
     M5.Lcd.setCursor(224,40);
     M5.Lcd.printf("size:% 9d", dataSize);
-    btnDrawer.setText(0, "Back/Up");
+    btnDrawer.setText(0, "Back / Up");
     btnDrawer.setText(2, "Down");
     return true;
   }
@@ -39,7 +39,7 @@ public:
       drawAddress();
     } else {
       delay(10);
-      header.draw();
+      Header.draw();
     }
     return true;
   }

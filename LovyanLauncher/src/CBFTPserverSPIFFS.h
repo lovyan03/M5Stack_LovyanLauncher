@@ -36,7 +36,7 @@ public:
   bool loop()
   {
     ftpSrv.handleFTP();
-    if (!(++counter & 0xF)) header.draw();
+    if (!(++counter & 0xF)) Header.draw();
     return true;
   }
 
@@ -65,16 +65,19 @@ private:
 
   void startFTP()
   {
-    ftpSrv.begin("M5","Stack");
+    String user = "esp32";
+    String pass = "esp32";
+    ftpSrv.begin(user, pass);
     M5.Lcd.setTextColor(0xFFFF, 0);
     M5.Lcd.setCursor(0,60);
     M5.Lcd.setTextFont(1);
     M5.Lcd.setTextSize(2);
     M5.Lcd.println("host : " + WiFi.localIP().toString());
-    M5.Lcd.print("user : M5\r\npass : Stack\r\n\r\n");
+    M5.Lcd.println("user : " + user);
+    M5.Lcd.println("pass : " + pass);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setTextFont(2);
-    M5.Lcd.print("ftp://M5:Stack@" + WiFi.localIP().toString() + "/");
+    M5.Lcd.print("\r\nftp://" + user + ":" + pass + "@" + WiFi.localIP().toString() + "/");
   }
 };
 CBFTPserverSPIFFS* CBFTPserverSPIFFS::me;

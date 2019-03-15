@@ -2,7 +2,7 @@
 #define _WIFIWPS_H_
 
 #include <WiFi.h>
-#include "header.h"
+#include "Header.h"
 #include <esp_wps.h>
 #include <Preferences.h>
 #include <MenuCallBack.h>
@@ -83,7 +83,7 @@ public:
 
   wifi_event_id_t onevent = 0;
   bool setup() {
-    header.draw();
+    Header.draw();
     M5.Lcd.setTextFont(0);
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
@@ -110,7 +110,7 @@ public:
 
   bool loop()
   {
-    header.draw();
+    Header.draw();
     M5.Lcd.setTextFont(0);
     M5.Lcd.setTextColor(0xFFFF);
     delay(100);

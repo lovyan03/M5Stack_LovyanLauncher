@@ -1,5 +1,5 @@
 #include <MenuCallBack.h>
-#include "header.h"
+#include "Header.h"
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiClient.h>
@@ -10,7 +10,7 @@ class WiFiSetting : public MenuCallBack
 {
 public:
   bool setup() {
-    header.draw();
+    Header.draw();
     M5.Lcd.setTextFont(0);
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
@@ -29,13 +29,14 @@ public:
   }
 
   bool loop() {
-    if (!(++counter & 0xF)) header.draw();
+    if (!(++counter & 0xF)) Header.draw();
     webServer.handleClient();
     return true;
   }
 
   void close()
   {
+    WiFi.mode(WIFI_MODE_STA);
     preferences.end();
   }
 

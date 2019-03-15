@@ -65,14 +65,17 @@ void setStyle(int tag)
   switch (tag) {
   default: return;
   case 0:
+    M5ButtonDrawer::height = 14;
+    M5ButtonDrawer::setTextFont(1);
     treeView.setTextFont(1);
     treeView.itemHeight = 18;
-    M5ButtonDrawer::height = 14;
     osk.keyHeight = 14;
     osk.setTextFont(1);
     break;
 
   case 1:
+    M5ButtonDrawer::height = 18;
+    M5ButtonDrawer::setTextFont(2);
     treeView.setTextFont(2);
     treeView.itemHeight = 20;
     osk.keyHeight = 18;
@@ -80,6 +83,8 @@ void setStyle(int tag)
     break;
 
   case 2:
+    M5ButtonDrawer::height = 18;
+    M5ButtonDrawer::setTextFont(2);
     treeView.setFreeFont(&FreeSans9pt7b);
     treeView.itemHeight = 24;
     osk.keyHeight = 18;
@@ -95,8 +100,9 @@ void callBackStyle(MenuItem* sender)
   setStyle(sender->tag);
 }
 
-void callBackWiFiDisconnect(MenuItem* sender)
+void callBackWiFiOff(MenuItem* sender)
 {
+  WiFi.mode(WIFI_MODE_STA);
   WiFi.disconnect(true);
 }
 
@@ -153,6 +159,7 @@ typedef std::vector<MenuItem*> vmi;
 
 void setup() {
   M5.begin();
+  M5.Speaker.begin();
   Wire.begin();
   if(digitalRead(BUTTON_A_PIN) == 0) {
      Serial.println("Will Load menu binary");
@@ -164,7 +171,7 @@ void setup() {
   M5ButtonDrawer::width = 106;
 
   treeView.clientRect.x = 2;
-  treeView.clientRect.y = 18;
+  treeView.clientRect.y = 16;
   treeView.clientRect.w = 196;
   treeView.clientRect.h = 200;
   treeView.itemWidth = 176;
@@ -187,7 +194,7 @@ void setup() {
                  { new MenuItemWiFiClient("WiFi Client", callBackWiFiClient)
                  , new MenuItem("WiFi WPS", callBackExec<WiFiWPS>)
                  , new MenuItem("WiFi Setting(AP&HTTP)", callBackExec<WiFiSetting>)
-                 , new MenuItem("WiFi Disconnect", callBackWiFiDisconnect)
+                 , new MenuItem("WiFi Off", callBackWiFiOff)
                  } )
                , new MenuItem("Tools", vmi
                  { new MenuItem("System Info", callBackExec<SystemInfo>)
@@ -222,11 +229,14 @@ void setup() {
   drawFrame();
 }
 
-long loopcnt = 0;
+uint8_t loopcnt = 0xf;
 void loop() {
   treeView.update();
   if (treeView.isRedraw()) {
     drawFrame();
+    loopcnt = 0xf;
   }
-  if (0 == (++loopcnt & 0xf)) header.draw();
+  if (0 == (++loopcnt & 0xf)) {
+    Header.draw();
+  }
 }

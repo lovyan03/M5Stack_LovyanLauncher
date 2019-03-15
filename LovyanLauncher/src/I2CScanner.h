@@ -18,7 +18,7 @@ public:
   }
   bool loop()
   {
-    header.draw();
+    Header.draw();
     M5.Lcd.setTextFont(1);
     M5.Lcd.setTextSize(1);
     M5.Lcd.setTextColor(0xFFFF, 0);
