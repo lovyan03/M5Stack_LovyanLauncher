@@ -4,23 +4,26 @@
 #include <MenuCallBack.h>
 #include "Header.h"
 #include "ESP32FtpServer.h"
-
-
+#include <SD.h>
+#include <SPIFFS.h>
 class CBFTPserver : public MenuCallBack
 {
 public:
-  FtpServer ftpSrv;
-
   bool setup(){
     M5.Lcd.setTextFont(0);
     me = this;
+    bool flgSD = isSD();
     M5.Lcd.setTextColor(0xFFFF);
     for (int i = 1; i < 16; ++i) {
-      M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << 1);
+      M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << (flgSD ? 1 : 6));
     }
-    M5.Lcd.drawString("FTP Server (SDcard)", 10, 10, 2);
-
-
+    M5.Lcd.drawString("FTP Server " + String(flgSD ? "(SDcard)" : "(SPIFFS)"), 10, 10, 2);
+    if (flgSD) {
+      SD.end();
+      SD.begin(TFCARD_CS_PIN);
+    } else {
+      SPIFFS.begin();
+    }
     closing = false;
     onevent = WiFi.onEvent(WiFiEvent);
     if (WiFi.status() == WL_CONNECTED) {
@@ -35,7 +38,7 @@ public:
 
   bool loop()
   {
-    ftpSrv.handleFTP();
+    getFTPServ()->handleFTP();
     if (!(++counter & 0xF)) Header.draw();
     return true;
   }
@@ -46,7 +49,6 @@ public:
     WiFi.removeEvent(onevent);
     delay(100);
   }
-
 private:
   long counter = 0;
   wifi_event_id_t onevent = 0;
@@ -67,7 +69,7 @@ private:
   {
     String user = "esp32";
     String pass = "esp32";
-    ftpSrv.begin(user, pass);
+    getFTPServ()->begin(user, pass);
     M5.Lcd.setTextColor(0xFFFF, 0);
     M5.Lcd.setCursor(0,60);
     M5.Lcd.setTextFont(1);
@@ -78,6 +80,23 @@ private:
     M5.Lcd.setTextSize(1);
     M5.Lcd.setTextFont(2);
     M5.Lcd.print("\r\nftp://" + user + ":" + pass + "@" + WiFi.localIP().toString() + "/");
+  }
+  virtual bool isSD() { return false; }
+  virtual FtpServer* getFTPServ() = 0;
+};
+class CBFTPserverSD : public CBFTPserver
+{
+  FtpServer ftpSrv;
+  bool isSD() { return true; }
+  FtpServer* getFTPServ() {
+    return &ftpSrv;
+  }
+};
+class CBFTPserverSPIFFS : public CBFTPserver
+{
+  FtpServerSPIFFS ftpSrv;
+  FtpServer* getFTPServ() {
+    return &ftpSrv;
   }
 };
 CBFTPserver* CBFTPserver::me;

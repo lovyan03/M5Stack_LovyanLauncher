@@ -5,14 +5,12 @@
 #undef min
 #include <algorithm>
 
-static SDUpdater sdUpdater;
-
 void MenuItemSDUpdater::onEnter() {
   if (!name.length()) {
-
-    // SDのルートフォルダから *.bin ファイルを探す。
+    SD.end();
+    SD.begin(TFCARD_CS_PIN);
+    // search *.bin files from SD root.
     deleteItems();
-    SD.begin();
     File root = SD.open("/");
     File file = root.openNextFile();
     MenuItemSDUpdater* mi;
@@ -31,25 +29,26 @@ void MenuItemSDUpdater::onEnter() {
       std::sort(Items.begin(), Items.end(), compareIgnoreCase);
     }
     root.close();
-  } else {
-    // 選択されたbinファイルでupdateを実行する。
-    String bin = "/" + name + ".bin";
-    sdUpdater.updateFromFS(SD, bin);
-    ESP.restart();
   }
   MenuItem::onEnter();
 }
 
 void MenuItemSDUpdater::onFocus() {
-  String filename = "/jpg/" + name + ".jpg";
-  if (SD.exists(filename.c_str())) {
-    M5.Lcd.drawJpgFile(SD, filename.c_str(), 200, 40);
+  if (name.length()) {
+    String filename = "/jpg/" + name + ".jpg";
+    if (SD.exists(filename.c_str())) {
+      M5.Lcd.drawJpgFile(SD, filename.c_str(), 200, 40);
+    } else {
+      M5.Lcd.setTextColor(0xFFFF);
+      M5.Lcd.drawRect(200, 40, 110, 110, 0xFFFF);
+      M5.Lcd.drawCentreString("- no image -", 255, 80, 2);
+    }
   }
 }
 
 void MenuItemSDUpdater::onDefocus() {
   if (name != "") {
-    M5.Lcd.fillRect(200, 30, 120, 140, backgroundColor);
+    M5.Lcd.fillRect(200, 40, 120, 140, backgroundColor);
   }
 }
 

@@ -9,6 +9,8 @@
 #include <MenuItemWiFiClient.h>
 #include <Preferences.h>
 #include <esp_sleep.h>
+#include <esp_partition.h>
+#include <nvs_flash.h>
 
 #include "src/MenuItemSDUpdater.h"
 #include "src/Header.h"
@@ -17,7 +19,9 @@
 #include "src/WiFiWPS.h"
 #include "src/BinaryViewer.h"
 #include "src/CBFTPserver.h"
-#include "src/CBFTPserverSPIFFS.h"
+//#include "src/CBFTPserverSPIFFS.h"
+#include "src/CBSDUpdater.h"
+#include "src/CBFSBench.h"
 #include "src/WiFiSetting.h"
 
 M5TreeView treeView;
@@ -28,36 +32,10 @@ void drawFrame() {
   r.inflate(1);
   M5.Lcd.drawRect(r.x -1, r.y, r.w +2, r.h, MenuItem::frameColor[1]);
   M5.Lcd.drawRect(r.x, r.y -1, r.w, r.h +2, MenuItem::frameColor[1]);
-  treeView.update(true);
-}
-
-void callBackWiFiClient(MenuItem* sender)
-{
-  MenuItemWiFiClient* mi = static_cast<MenuItemWiFiClient*>(sender);
-  if (!mi) return;
-
-  if (mi->ssid == "") return;
-
-  Preferences preferences;
-  preferences.begin("wifi-config");
-  preferences.putString("WIFI_SSID", mi->ssid);
-  String wifi_passwd = preferences.getString("WIFI_PASSWD");
-
-  if (mi->auth != WIFI_AUTH_OPEN) {
-    osk.setup(wifi_passwd);
-    while (osk.loop()) { delay(1); }
-    wifi_passwd = osk.getString();
-    osk.close();
-    WiFi.disconnect();
-    WiFi.begin(mi->ssid.c_str(), wifi_passwd.c_str());
-    preferences.putString("WIFI_PASSWD", wifi_passwd);
-  } else {
-    WiFi.disconnect();
-    WiFi.begin(mi->ssid.c_str(), "");
-    preferences.putString("WIFI_PASSWD", "");
-  }
-  preferences.end();
-  while (M5.BtnA.isPressed()) M5.update();
+  M5.Lcd.setTextFont(0);
+  M5.Lcd.setTextColor(0x8410,0);
+  M5.Lcd.drawString("LovyanLauncher0.1.1", 204,201,1);
+  M5.Lcd.drawString("http://git.io/fhdJV", 204,211,1);
 }
 
 void setStyle(int tag)
@@ -100,10 +78,65 @@ void callBackStyle(MenuItem* sender)
   setStyle(sender->tag);
 }
 
+void callBackWiFiClient(MenuItem* sender)
+{
+  MenuItemWiFiClient* mi = static_cast<MenuItemWiFiClient*>(sender);
+  if (!mi) return;
+
+  if (mi->ssid == "") return;
+
+  Preferences preferences;
+  preferences.begin("wifi-config");
+  preferences.putString("WIFI_SSID", mi->ssid);
+  String wifi_passwd = preferences.getString("WIFI_PASSWD");
+
+  if (mi->auth != WIFI_AUTH_OPEN) {
+    osk.setup(wifi_passwd);
+    while (osk.loop()) { delay(1); }
+    wifi_passwd = osk.getString();
+    osk.close();
+    WiFi.disconnect();
+    WiFi.begin(mi->ssid.c_str(), wifi_passwd.c_str());
+    preferences.putString("WIFI_PASSWD", wifi_passwd);
+  } else {
+    WiFi.disconnect();
+    WiFi.begin(mi->ssid.c_str(), "");
+    preferences.putString("WIFI_PASSWD", "");
+  }
+  preferences.end();
+  while (M5.BtnA.isPressed()) M5.update();
+}
+
 void callBackWiFiOff(MenuItem* sender)
 {
   WiFi.mode(WIFI_MODE_STA);
   WiFi.disconnect(true);
+}
+
+void callBackFormatSPIFFS(MenuItem* sender)
+{
+  M5.Lcd.fillRect(20, 100, 160, 30, 0);
+  M5.Lcd.drawRect(23, 103, 154, 24, 0xFFFF);
+  M5.Lcd.setTextFont(0);
+  M5.Lcd.setTextColor(0xFFFF, 0);
+  M5.Lcd.drawCentreString("SPIFFS Format...", 90, 106, 2);
+  SPIFFS.begin();
+  SPIFFS.format();
+  SPIFFS.end();
+}
+
+void callBackFormatNVS(MenuItem* sender)
+{
+  M5.Lcd.fillRect(20, 100, 160, 30, 0);
+  M5.Lcd.drawRect(23, 103, 154, 24, 0xFFFF);
+  M5.Lcd.setTextFont(0);
+  M5.Lcd.setTextColor(0xFFFF, 0);
+  M5.Lcd.drawCentreString("NVS erase...", 90, 106, 2);
+  nvs_flash_init();
+  nvs_flash_erase();
+  nvs_flash_deinit();
+  nvs_flash_init();
+  delay(1000);
 }
 
 void callBackDeepSleep(MenuItem* sender)
@@ -199,10 +232,18 @@ void setup() {
                , new MenuItem("Tools", vmi
                  { new MenuItem("System Info", callBackExec<SystemInfo>)
                  , new MenuItem("I2C Scanner", callBackExec<I2CScanner>)
-                 , new MenuItem("FTP Server (SDcard)", callBackExec<CBFTPserver>)
+                 , new MenuItem("FTP Server (SDcard)", callBackExec<CBFTPserverSD>)
                  , new MenuItem("FTP Server (SPIFFS)", callBackExec<CBFTPserverSPIFFS>)
+                 , new MenuItem("Benchmark (SDcard)", callBackExec<CBFSBenchSD>)
+                 , new MenuItem("Benchmark (SPIFFS)", callBackExec<CBFSBenchSPIFFS>)
+                 , new MenuItem("Format SPIFFS", vmi
+                   { new MenuItem("Format Execute", callBackFormatSPIFFS)
+                   } )
+                 , new MenuItem("Erase NVS(Preferences)", vmi
+                   { new MenuItem("Erase Execute", callBackFormatNVS)
+                   } )
                  } )
-               , new MenuItemSDUpdater("SD Updater")
+               , new MenuItemSDUpdater("SD Updater", callBackExec<CBSDUpdater>)
                , new MenuItem("Binary Viewer", vmi
                  { new MenuItemSD(    "SDCard", callBackExec<BinaryViewerFS>)
                  , new MenuItemSPIFFS("SPIFFS", callBackExec<BinaryViewerFS>)

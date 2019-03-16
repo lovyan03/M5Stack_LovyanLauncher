@@ -48,9 +48,9 @@ FACES/JoyStick/PLUSEncoder/CardKB にも対応しています。
 動作には以下のライブラリが必要です。  
 
 * https://github.com/tobozo/M5Stack-SD-Updater/  
+* https://github.com/bblanchon/ArduinoJson
 * https://github.com/lovyan03/M5Stack_TreeView/  
 * https://github.com/lovyan03/M5Stack_OnScreenKeyboard/  
-
 
 
 ## Licence
