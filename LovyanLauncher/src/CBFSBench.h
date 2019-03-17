@@ -73,16 +73,16 @@ protected:
     M5.Lcd.setCursor(0, 70);
     M5.Lcd.println("Bench Start");
     uint64_t time = getWriteTime(tmpFile, 1024, 20);
-    M5.Lcd.printf("write speed 1KB:%7d KiB/sec\r\n", (uint64_t)(1000000) * 20 / time);
+    M5.Lcd.printf("write speed 1KiB:%7d KiB/sec\r\n", (uint64_t)(1000000) * 20 / time);
 
     time = getReadTime(tmpFile, 1024, 100);
-    M5.Lcd.printf("read speed 1KB:%7d KiB/sec\r\n", (uint64_t)(1000000) * 100 / time);
+    M5.Lcd.printf("read speed 1KiB:%7d KiB/sec\r\n", (uint64_t)(1000000) * 100 / time);
 
     time = getWriteTime(tmpFile, 4096, 20);
-    M5.Lcd.printf("write speed 4KB:%7d KiB/sec\r\n", (uint64_t)(4000000) * 20 / time);
+    M5.Lcd.printf("write speed 4KiB:%7d KiB/sec\r\n", (uint64_t)(4000000) * 20 / time);
 
     time = getReadTime(tmpFile, 4096, 100);
-    M5.Lcd.printf("read speed 4KB:%7d KiB/sec\r\n", (uint64_t)(4000000) * 100 / time);
+    M5.Lcd.printf("read speed 4KiB:%7d KiB/sec\r\n", (uint64_t)(4000000) * 100 / time);
 
     time = getOpenCloseTime(tmpFile, 100);
     M5.Lcd.printf("simple open close:%5d count/sec\r\n", (uint64_t)(1000000) * 100 / time);
