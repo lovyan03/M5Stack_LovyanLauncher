@@ -17,7 +17,7 @@ public:
     for (int i = 1; i < 16; ++i) {
       M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << (flgSD ? 1 : 6));
     }
-    M5.Lcd.drawString("FTP Server " + String(flgSD ? "(SDcard)" : "(SPIFFS)"), 10, 10, 2);
+    M5.Lcd.drawString("FTP Server " + String(flgSD ? "(SDCard)" : "(SPIFFS)"), 10, 10, 2);
     if (flgSD) {
       SD.end();
       SD.begin(TFCARD_CS_PIN);

@@ -19,7 +19,6 @@
 #include "src/WiFiWPS.h"
 #include "src/BinaryViewer.h"
 #include "src/CBFTPserver.h"
-//#include "src/CBFTPserverSPIFFS.h"
 #include "src/CBSDUpdater.h"
 #include "src/CBFSBench.h"
 #include "src/WiFiSetting.h"
@@ -34,8 +33,8 @@ void drawFrame() {
   M5.Lcd.drawRect(r.x, r.y -1, r.w, r.h +2, MenuItem::frameColor[1]);
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
-  M5.Lcd.drawString("LovyanLauncher0.1.1", 204,201,1);
-  M5.Lcd.drawString("http://git.io/fhdJV", 204,211,1);
+  M5.Lcd.drawString("LovyanLauncher0.1.2", 204, 201, 1);
+  M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
 void setStyle(int tag)
@@ -232,9 +231,9 @@ void setup() {
                , new MenuItem("Tools", vmi
                  { new MenuItem("System Info", callBackExec<SystemInfo>)
                  , new MenuItem("I2C Scanner", callBackExec<I2CScanner>)
-                 , new MenuItem("FTP Server (SDcard)", callBackExec<CBFTPserverSD>)
+                 , new MenuItem("FTP Server (SDCard)", callBackExec<CBFTPserverSD>)
                  , new MenuItem("FTP Server (SPIFFS)", callBackExec<CBFTPserverSPIFFS>)
-                 , new MenuItem("Benchmark (SDcard)", callBackExec<CBFSBenchSD>)
+                 , new MenuItem("Benchmark (SDCard)", callBackExec<CBFSBenchSD>)
                  , new MenuItem("Benchmark (SPIFFS)", callBackExec<CBFSBenchSPIFFS>)
                  , new MenuItem("Format SPIFFS", vmi
                    { new MenuItem("Format Execute", callBackFormatSPIFFS)
@@ -249,7 +248,7 @@ void setup() {
                  , new MenuItemSPIFFS("SPIFFS", callBackExec<BinaryViewerFS>)
                  , new MenuItem("FLASH", vmi
                    { new MenuItem("2nd boot loader", 0, callBackExec<BinaryViewerFlash>)
-                   , new MenuItem("partation table", 1, callBackExec<BinaryViewerFlash>)
+                   , new MenuItem("partition table", 1, callBackExec<BinaryViewerFlash>)
                    , new MenuItem("nvs",         0x102, callBackExec<BinaryViewerFlash>)
                    , new MenuItem("otadata",     0x100, callBackExec<BinaryViewerFlash>)
                    , new MenuItem("app0",        0x010, callBackExec<BinaryViewerFlash>)

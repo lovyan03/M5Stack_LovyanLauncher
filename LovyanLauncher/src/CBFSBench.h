@@ -18,13 +18,8 @@ public:
     for (int i = 1; i < 16; ++i) {
       M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), (&fs == &SD) ? (i << 1) : (i << 6));
     }
-    M5.Lcd.drawString(String((&fs == &SD) ? "SD" : "SPIFFS") + " Benchmark", 10, 10, 2);
-    init();
-    M5.Lcd.setTextColor(0xFFFF, 0);
-    M5.Lcd.setCursor(0, 30);
-    M5.Lcd.printf("total:%12d Bytes\r\n" , totalBytes());
-    M5.Lcd.printf("used :%12d Bytes\r\n" , usedBytes());
-    M5.Lcd.printf("free :%12d Bytes\r\n" , totalBytes() - usedBytes());
+    M5.Lcd.drawString("Benchmark " + String((&fs == &SD) ? "(SDCard)" : "(SPIFFS)"), 10, 10, 2);
+    showFSInfo();
     return true;
   }
 
@@ -43,22 +38,51 @@ public:
   }
 
 protected:
+  void showFSInfo() {
+    init();
+    M5.Lcd.setTextFont(0);
+    M5.Lcd.setTextColor(0xFFFF, 0);
+    M5.Lcd.setCursor(0, 30);
+
+    M5.Lcd.println("total:" + getStrSize(totalBytes()));
+    M5.Lcd.println("used :" + getStrSize(usedBytes()));
+    M5.Lcd.println("free :" + getStrSize(totalBytes() - usedBytes()));
+  }
+
+  String getStrSize(uint64_t value) {
+    int base = 0;
+    for (; base < 3 && (value >= (100 * 1024)); ++base) {
+      value = value >> 10;
+    }
+    String space = "";
+    int dig = (value == 0) ? 0 : log10(value);
+    for (int i = 6 - dig; i > 0; --i) space += " ";
+    return space + String((long)value, DEC)
+         + ((base == 3) ? " GiB"
+          : (base == 2) ? " MiB"
+          : (base == 1) ? " KiB"
+          : (base == 0) ? " Byte"
+                        : " ??");
+  }
+
   void ExecBench() {
-    M5.Lcd.fillRect(0, 70, M5.Lcd.width(), 120, 0);
+    M5.Lcd.fillRect(0, 30, M5.Lcd.width(), 160, 0);
+    showFSInfo();
+    M5.Lcd.setTextFont(2);
     M5.Lcd.setTextColor(0xFFFF,0);
     M5.Lcd.setCursor(0, 70);
     M5.Lcd.println("Bench Start");
     uint64_t time = getWriteTime(tmpFile, 1024, 20);
-    M5.Lcd.printf("write speed 1KB:%7d KByte/sec\r\n", (uint64_t)(1000000) * 20 / time);
+    M5.Lcd.printf("write speed 1KB:%7d KiB/sec\r\n", (uint64_t)(1000000) * 20 / time);
 
     time = getReadTime(tmpFile, 1024, 100);
-    M5.Lcd.printf("read speed 1KB:%7d KByte/sec\r\n", (uint64_t)(1000000) * 100 / time);
+    M5.Lcd.printf("read speed 1KB:%7d KiB/sec\r\n", (uint64_t)(1000000) * 100 / time);
 
     time = getWriteTime(tmpFile, 4096, 20);
-    M5.Lcd.printf("write speed 4KB:%7d KByte/sec\r\n", (uint64_t)(4000000) * 20 / time);
+    M5.Lcd.printf("write speed 4KB:%7d KiB/sec\r\n", (uint64_t)(4000000) * 20 / time);
 
     time = getReadTime(tmpFile, 4096, 100);
-    M5.Lcd.printf("read speed 4KB:%7d KByte/sec\r\n", (uint64_t)(4000000) * 100 / time);
+    M5.Lcd.printf("read speed 4KB:%7d KiB/sec\r\n", (uint64_t)(4000000) * 100 / time);
 
     time = getOpenCloseTime(tmpFile, 100);
     M5.Lcd.printf("simple open close:%5d count/sec\r\n", (uint64_t)(1000000) * 100 / time);
