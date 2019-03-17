@@ -3,6 +3,7 @@
 
 #include <MenuCallBack.h>
 #include <ArduinoJson.h>     // https://github.com/bblanchon/ArduinoJson/
+#include <utility/qrcode.h>
 #include "MenuItemSDUpdater.h"
 #include "Header.h"
 
@@ -22,7 +23,7 @@ public:
     for (int i = 1; i < 16; ++i) {
       M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << 1);
     }
-    M5.Lcd.drawString("SD Updater : "+ mi->name, 10, 10, 2);
+    M5.Lcd.drawString("SD Updater : " + mi->name, 10, 10, 2);
 
     fileName = "/" + mi->name + ".bin";
     iconName = "/jpg/" + mi->name + ".jpg";
@@ -143,7 +144,7 @@ private:
   void drawQRcode()
   {
     if( jsonMeta.projectURL!="" ) { // only projectURL
-      M5.Lcd.qrcode(jsonMeta.projectURL, 90, 80, 140);
+      M5.Lcd.qrcode(jsonMeta.projectURL, 90, 80, 140, getLowestQRVersionFromString(jsonMeta.projectURL, 2));
       M5.Lcd.setTextFont(2);
       M5.Lcd.setCursor(0, 60);
       M5.Lcd.print( jsonMeta.projectURL );
@@ -153,5 +154,24 @@ private:
     }
   }
 
+  uint8_t getLowestQRVersionFromString( String text, uint8_t ecc ) {
+// https://github.com/tobozo/M5Stack-SD-Updater/blob/master/examples/M5Stack-SD-Menu/M5Stack-SD-Menu.ino#L279
+    if (ecc>3) return 4; // fail fast
+    uint16_t len = text.length();
+    uint8_t QRMaxLenByECCLevel[4][3] = {
+      // https://www.qrcode.com/en/about/version.html  
+      { 25, 47, 77 }, // L
+      { 20, 38, 61 }, // M
+      { 16, 29, 47 }, // Q
+      { 10, 20, 35 }  // H
+    };
+    for ( uint8_t i=0; i<3; i++ ) {
+      if ( len <= QRMaxLenByECCLevel[ecc][i] ) {
+        return i+1;
+      }
+    }
+    // there's no point in doing higher with M5Stack's display
+    return 4;
+  }
 };
 #endif

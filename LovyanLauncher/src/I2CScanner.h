@@ -13,7 +13,7 @@ public:
     for (int i = 1; i < 16; ++i) {
       M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << 1);
     }
-    M5.Lcd.drawString("I2C Scanner", 10, 10, 2);
+    M5.Lcd.drawString(menuItem->title, 10, 10, 2);
     return true;
   }
   bool loop()

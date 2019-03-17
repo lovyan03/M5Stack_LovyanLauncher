@@ -18,7 +18,7 @@ public:
     for (int i = 1; i < 16; ++i) {
       M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), (&fs == &SD) ? (i << 1) : (i << 6));
     }
-    M5.Lcd.drawString("Benchmark " + String((&fs == &SD) ? "(SDCard)" : "(SPIFFS)"), 10, 10, 2);
+    M5.Lcd.drawString(menuItem->title, 10, 10, 2);
     showFSInfo();
     return true;
   }

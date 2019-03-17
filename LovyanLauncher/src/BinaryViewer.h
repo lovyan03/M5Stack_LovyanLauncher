@@ -122,7 +122,7 @@ public:
     for (int i = 1; i < 16; ++i) {
       M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), (&fs == &SD) ? (i << 1) : (i << 6));
     }
-    M5.Lcd.drawString(String((&fs == &SD) ? "SD" : "SPIFFS") + " FileBinaryViewer", 10, 10, 2);
+    M5.Lcd.drawString("Binary Viewer " + String((&fs == &SD) ? "(SDCard)" : "(SPIFFS)"), 10, 10, 2);
 
     M5.Lcd.drawString(mi->path, 0, 30, 1);
 
@@ -175,7 +175,7 @@ public:
     for (int i = 1; i < 16; ++i) {
       M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), (i << 12) | (i << 6));
     }
-    M5.Lcd.drawString("FLASH BinaryViewer", 10, 10, 2);
+    M5.Lcd.drawString("Binary Viewer (FLASH)", 10, 10, 2);
 
     M5.Lcd.drawString("0x" + String(partition.address, HEX) + ":" + partition.label + (partition.encrypted ? " encrypted" : ""), 0, 30, 1);
 
