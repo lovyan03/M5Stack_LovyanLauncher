@@ -1,7 +1,7 @@
 [
     {
         "name": "LovyanLauncher-v0.1.2 for 4MB model",
-        "version": "v0.01",
+        "version": "v0.1.2",
         "path": "LovyanLauncher",
         "commands": [
             "--chip esp32 --port %port --baud %baud --before default_reset --after hard_reset write_flash -z --flash_freq 40m 
@@ -12,7 +12,7 @@
     },
     {
         "name": "LovyanLauncher-v0.1.2 for 16MB model",
-        "version": "v0.01",
+        "version": "v0.1.2",
         "path": "LovyanLauncher",
         "commands": [
             "--chip esp32 --port %port --baud %baud --before default_reset --after hard_reset write_flash -z --flash_freq 40m 
