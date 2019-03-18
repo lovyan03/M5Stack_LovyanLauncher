@@ -1,3 +1,4 @@
+
 #include <vector>
 #include <M5Stack.h>
 #include <M5StackUpdater.h>     // https://github.com/tobozo/M5Stack-SD-Updater/
@@ -25,6 +26,7 @@
 
 M5TreeView treeView;
 M5OnScreenKeyboard osk;
+const uint8_t NEOPIXEL_pin = 15;
 
 void drawFrame() {
   Rect16 r = treeView.clientRect;
@@ -171,6 +173,28 @@ void callBackBatteryIP5306CTL0(MenuItem* sender)
   setIP5306REG(0, mi->value ? (data | mi->tag) : (data & ~(mi->tag)));
 }
 
+void sendNeoPixelBit(bool flg) {
+  digitalWrite(NEOPIXEL_pin, HIGH);
+  for (int i = 0; i < 4; ++i) digitalWrite(NEOPIXEL_pin, flg);
+  digitalWrite(NEOPIXEL_pin, LOW);
+}
+void sendNeoPixelColor(uint32_t color) {
+  for (uint8_t i = 0; i < 24; ++i) {
+    sendNeoPixelBit(color & 0x800000);
+    color = color << 1;
+  }
+}
+
+void callBackFIRELED(MenuItem* sender)
+{
+  MenuItemToggle* mi((MenuItemToggle*)sender); 
+  if (mi->value) {
+    sendNeoPixelColor(0xFFFFFF);
+  } else {
+    sendNeoPixelColor(0);
+  }
+}
+
 void callBackRollBack(MenuItem* sender)
 {
   if( Update.canRollBack() )  {
@@ -193,6 +217,12 @@ void setup() {
   M5.begin();
   M5.Speaker.begin();
   Wire.begin();
+// for fire LED off
+  pinMode(NEOPIXEL_pin, OUTPUT);
+  sendNeoPixelColor(1);
+  delay(1);
+  sendNeoPixelColor(0);
+
   if(digitalRead(BUTTON_A_PIN) == 0) {
      Serial.println("Will Load menu binary");
      updateFromFS(SD);
@@ -261,6 +291,7 @@ void setup() {
                  { new MenuItemToggle("BatteryCharge" , getIP5306REG(0) & 0x10, 0x10, callBackBatteryIP5306CTL0)
                  , new MenuItemToggle("BatteryOutput" , getIP5306REG(0) & 0x20, 0x20, callBackBatteryIP5306CTL0)
                  , new MenuItemToggle("Boot on load"  , getIP5306REG(0) & 0x04, 0x04, callBackBatteryIP5306CTL0)
+                 , new MenuItemToggle("FIRE LED", false, callBackFIRELED)
                  , new MenuItem("DeepSleep", callBackDeepSleep)
                  })
                , new MenuItem("OTA Rollback", callBackRollBack)
@@ -269,14 +300,14 @@ void setup() {
   drawFrame();
 }
 
-uint8_t loopcnt = 0xf;
+uint8_t loopcnt = 0xF;
 void loop() {
   treeView.update();
   if (treeView.isRedraw()) {
     drawFrame();
-    loopcnt = 0xf;
+    loopcnt = 0xF;
   }
-  if (0 == (++loopcnt & 0xf)) {
+  if (0 == (++loopcnt & 0xF)) {
     Header.draw();
   }
 }
