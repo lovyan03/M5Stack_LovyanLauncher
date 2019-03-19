@@ -242,14 +242,6 @@ void setup() {
      ESP.restart();
   }
 
-// restore setting
-  Preferences p;
-  p.begin(preferName, true);
-  setIP5306REG(0, p.getUChar(preferName, getIP5306REG(0)));
-  setStyle(p.getUChar(preferKeyStyle, 1));
-  p.end();
-
-
   M5ButtonDrawer::width = 106;
 
   treeView.clientRect.x = 2;
@@ -266,6 +258,17 @@ void setup() {
   osk.useCardKB      = true;
   osk.usePLUSEncoder = true;
   osk.useJoyStick    = true;
+
+  drawFrame();
+
+// restore setting
+  Preferences p;
+  p.begin(preferName, true);
+  setIP5306REG(0, p.getUChar(preferName, getIP5306REG(0))
+                 |((getIP5306REG(0x70) & 0x04) ? 0x20: 0) ); //When using battery, Prohibit battery non-use setting.
+  setStyle(p.getUChar(preferKeyStyle, 1));
+  p.end();
+
   treeView.setItems(vmi
                { new MenuItemSDUpdater("SD Updater", callBackExec<CBSDUpdater>)
                , new MenuItem("WiFi ", vmi
@@ -320,7 +323,6 @@ void setup() {
                    } )
                } );
   treeView.begin();
-  drawFrame();
 }
 
 uint8_t loopcnt = 0xF;

@@ -23,7 +23,7 @@ public:
 
     preferences.begin("wifi-config");
 
-    M5.Lcd.setCursor(0,50);
+    M5.Lcd.setCursor(0,30);
     M5.Lcd.setTextFont(2);
     M5.Lcd.print("Starting Web Server...");
 
@@ -64,10 +64,12 @@ private:
   Preferences preferences;
 
   void startWebServer() {
+    String strAPIP = WiFi.softAPIP().toString();
     M5.Lcd.setTextFont(1);
     M5.Lcd.setTextSize(2);
     M5.Lcd.print("host : ");
-    M5.Lcd.println(WiFi.softAPIP());
+    M5.Lcd.println(strAPIP);
+    M5.Lcd.qrcode("http://" + strAPIP, 200, 80, 120, 2);
     webServer.onNotFound([this]() {
       String s = "<h1>Wi-Fi Settings</h1><p>Please enter your password by selecting the SSID.</p>"
                  "<form method=\"get\" action=\"setap\"><label>SSID: </label><select name=\"ssid\">"
@@ -115,15 +117,15 @@ private:
       ssidList += WiFi.SSID(i);
       ssidList += "</option>";
     }
+    M5.Lcd.setTextFont(1);
+    M5.Lcd.setTextSize(2);
+    M5.Lcd.print("  AP : ");
+    M5.Lcd.println(apSSID);
     delay(100);
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     WiFi.softAP(apSSID);
     WiFi.mode(WIFI_MODE_AP);
     startWebServer();
-    M5.Lcd.setTextFont(1);
-    M5.Lcd.setTextSize(2);
-    M5.Lcd.print("  AP : ");
-    M5.Lcd.println(apSSID);
   }
 
   String makePage(String title, String contents) {
