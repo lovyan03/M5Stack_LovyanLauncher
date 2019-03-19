@@ -12,6 +12,7 @@ class CBFSBench : public MenuCallBack
 public:
   bool setup() 
   {
+    Header.draw();
     M5.Lcd.setTextFont(0);
     M5.Lcd.setTextColor(0xFFFF);
     fs::FS& fs(getFS());

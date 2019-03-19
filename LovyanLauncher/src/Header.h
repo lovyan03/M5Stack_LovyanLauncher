@@ -1,6 +1,8 @@
 #ifndef _HEADER_H_
 #define _HEADER_H_
 
+#include <WiFiType.h>
+
 class HeaderDrawer {
 public:
   HeaderDrawer() {};

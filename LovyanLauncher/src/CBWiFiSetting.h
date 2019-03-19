@@ -1,3 +1,6 @@
+#ifndef _CBWIFISETTING_H_
+#define _CBWIFISETTING_H_
+
 #include <MenuCallBack.h>
 #include "Header.h"
 #include <WiFi.h>
@@ -6,7 +9,7 @@
 #include "WebServer.h"
 #include <Preferences.h>
 
-class WiFiSetting : public MenuCallBack
+class CBWiFiSetting : public MenuCallBack
 {
 public:
   bool setup() {
@@ -40,7 +43,7 @@ public:
     preferences.end();
   }
 
-  WiFiSetting()
+  CBWiFiSetting()
   : MenuCallBack()
   , apIP(192, 168, 4, 1)
   , apSSID("M5STACK_SETUP")
@@ -169,3 +172,4 @@ private:
     return s;
   }
 };
+#endif

@@ -1,6 +1,5 @@
 #include <M5Stack.h>
 #include <WiFi.h>
-#include <WiFiType.h>
 #include <esp_wifi.h>
 
 #include "Header.h"

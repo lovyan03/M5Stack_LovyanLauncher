@@ -1,4 +1,3 @@
-
 #include <vector>
 #include <M5Stack.h>
 #include <M5StackUpdater.h>     // https://github.com/tobozo/M5Stack-SD-Updater/
@@ -22,12 +21,15 @@
 #include "src/CBFTPserver.h"
 #include "src/CBSDUpdater.h"
 #include "src/CBFSBench.h"
-#include "src/WiFiSetting.h"
+#include "src/CBWiFiSetting.h"
+#include "src/CBWiFiSmartConfig.h"
 
 M5TreeView treeView;
 M5OnScreenKeyboard osk;
-const uint8_t NEOPIXEL_pin = 15;
-
+constexpr uint8_t NEOPIXEL_pin = 15;
+constexpr char* preferName     ( "LovyanLauncher" );
+constexpr char* preferKeyIP5306( "IP5306CTL0" );
+constexpr char* preferKeyStyle ( "TVStyle" );
 void drawFrame() {
   Rect16 r = treeView.clientRect;
   r.inflate(1);
@@ -35,7 +37,8 @@ void drawFrame() {
   M5.Lcd.drawRect(r.x, r.y -1, r.w, r.h +2, MenuItem::frameColor[1]);
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
-  M5.Lcd.drawString("LovyanLauncher0.1.2", 204, 201, 1);
+  M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
+  M5.Lcd.drawString("@lovyan03    v0.1.3", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -77,6 +80,10 @@ void setStyle(int tag)
 void callBackStyle(MenuItem* sender)
 {
   setStyle(sender->tag);
+  Preferences p;
+  p.begin(preferName);
+  p.putUChar(preferKeyStyle, sender->tag);
+  p.end();
 }
 
 void callBackWiFiClient(MenuItem* sender)
@@ -170,7 +177,12 @@ void callBackBatteryIP5306CTL0(MenuItem* sender)
 {
   MenuItemToggle* mi((MenuItemToggle*)sender); 
   uint8_t data = getIP5306REG(0);
-  setIP5306REG(0, mi->value ? (data | mi->tag) : (data & ~(mi->tag)));
+  data = mi->value ? (data | mi->tag) : (data & ~(mi->tag));
+  Preferences p;
+  p.begin(preferName);
+  p.putUChar(preferName, data);
+  p.end();
+  setIP5306REG(0, data);
 }
 
 void sendNeoPixelBit(bool flg) {
@@ -223,12 +235,20 @@ void setup() {
   delay(1);
   sendNeoPixelColor(0);
 
+
   if(digitalRead(BUTTON_A_PIN) == 0) {
      Serial.println("Will Load menu binary");
      updateFromFS(SD);
      ESP.restart();
   }
-  setStyle(1);
+
+// restore setting
+  Preferences p;
+  p.begin(preferName, true);
+  setIP5306REG(0, p.getUChar(preferName, getIP5306REG(0)));
+  setStyle(p.getUChar(preferKeyStyle, 1));
+  p.end();
+
 
   M5ButtonDrawer::width = 106;
 
@@ -247,15 +267,12 @@ void setup() {
   osk.usePLUSEncoder = true;
   osk.useJoyStick    = true;
   treeView.setItems(vmi
-               { new MenuItem("Style ", callBackStyle, vmi
-                 { new MenuItem("FreeSans9pt7b", 2)
-                 , new MenuItem("Font 2" , 1)
-                 , new MenuItem("Font 1", 0)
-                 } )
+               { new MenuItemSDUpdater("SD Updater", callBackExec<CBSDUpdater>)
                , new MenuItem("WiFi ", vmi
                  { new MenuItemWiFiClient("WiFi Client", callBackWiFiClient)
                  , new MenuItem("WiFi WPS", callBackExec<WiFiWPS>)
-                 , new MenuItem("WiFi Setting(AP&HTTP)", callBackExec<WiFiSetting>)
+                 , new MenuItem("WiFi SmartConfig"     , callBackExec<CBWiFiSmartConfig>)
+                 , new MenuItem("WiFi Setting(AP&HTTP)", callBackExec<CBWiFiSetting>)
                  , new MenuItem("WiFi Off", callBackWiFiOff)
                  } )
                , new MenuItem("Tools", vmi
@@ -271,8 +288,12 @@ void setup() {
                  , new MenuItem("Erase NVS(Preferences)", vmi
                    { new MenuItem("Erase Execute", callBackFormatNVS)
                    } )
+                 , new MenuItem("Style ", callBackStyle, vmi
+                   { new MenuItem("FreeSans9pt7b", 2)
+                   , new MenuItem("Font 2" , 1)
+                   , new MenuItem("Font 1", 0)
+                   } )
                  } )
-               , new MenuItemSDUpdater("SD Updater", callBackExec<CBSDUpdater>)
                , new MenuItem("Binary Viewer", vmi
                  { new MenuItemSD(    "SDCard", callBackExec<BinaryViewerFS>)
                  , new MenuItemSPIFFS("SPIFFS", callBackExec<BinaryViewerFS>)
@@ -294,20 +315,30 @@ void setup() {
                  , new MenuItemToggle("FIRE LED", false, callBackFIRELED)
                  , new MenuItem("DeepSleep", callBackDeepSleep)
                  })
-               , new MenuItem("OTA Rollback", callBackRollBack)
+               , new MenuItem("OTA Rollback", vmi
+                   { new MenuItem("Rollback Execute", callBackRollBack)
+                   } )
                } );
   treeView.begin();
   drawFrame();
 }
 
 uint8_t loopcnt = 0xF;
+long lastctrl = millis();
+MenuItem* miFocus;
 void loop() {
-  treeView.update();
+  if (NULL != treeView.update()) {
+    lastctrl = millis();
+  }
   if (treeView.isRedraw()) {
     drawFrame();
     loopcnt = 0xF;
   }
   if (0 == (++loopcnt & 0xF)) {
     Header.draw();
+    if ( 600000 < millis() - lastctrl ) {
+      Serial.println( "goto sleep" );
+      callBackDeepSleep(NULL);
+    }
   }
 }
