@@ -23,11 +23,11 @@
 #include "src/CBFSBench.h"
 #include "src/CBWiFiSetting.h"
 #include "src/CBWiFiSmartConfig.h"
+#include "src/GlobalParams.h"
 
 M5TreeView treeView;
 M5OnScreenKeyboard osk;
 constexpr uint8_t NEOPIXEL_pin = 15;
-constexpr char* preferName     ( "LovyanLauncher" );
 constexpr char* preferKeyIP5306( "IP5306CTL0" );
 constexpr char* preferKeyStyle ( "TVStyle" );
 void drawFrame() {
@@ -38,7 +38,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03    v0.1.3", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03    v0.1.4", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -186,25 +186,27 @@ void callBackBatteryIP5306CTL0(MenuItem* sender)
 }
 
 void sendNeoPixelBit(bool flg) {
-  digitalWrite(NEOPIXEL_pin, HIGH);
-  for (int i = 0; i < 4; ++i) digitalWrite(NEOPIXEL_pin, flg);
-  digitalWrite(NEOPIXEL_pin, LOW);
+  for (int i = 0; i < 2; ++i) digitalWrite(NEOPIXEL_pin, HIGH);
+  for (int i = 0; i < 6; ++i) digitalWrite(NEOPIXEL_pin, flg);
+  for (int i = 0; i < 3; ++i) digitalWrite(NEOPIXEL_pin, LOW);
 }
-void sendNeoPixelColor(uint32_t color) {
+void sendNeoPixelColor(uint32_t color) { // 24bit GRB
   for (uint8_t i = 0; i < 24; ++i) {
     sendNeoPixelBit(color & 0x800000);
     color = color << 1;
   }
 }
-
+void setNeoPixelAll(uint32_t color) {
+  sendNeoPixelBit(false);
+  delay(1);
+  for (uint8_t i = 0; i < 10; ++i) {
+    sendNeoPixelColor(color);
+  }
+}
 void callBackFIRELED(MenuItem* sender)
 {
   MenuItemToggle* mi((MenuItemToggle*)sender); 
-  if (mi->value) {
-    sendNeoPixelColor(0xFFFFFF);
-  } else {
-    sendNeoPixelColor(0);
-  }
+  setNeoPixelAll(mi->value ? 0x555555 : 0);
 }
 
 void callBackRollBack(MenuItem* sender)
@@ -229,11 +231,10 @@ void setup() {
   M5.begin();
   M5.Speaker.begin();
   Wire.begin();
+
 // for fire LED off
   pinMode(NEOPIXEL_pin, OUTPUT);
-  sendNeoPixelColor(1);
-  delay(1);
-  sendNeoPixelColor(0);
+  setNeoPixelAll(0);
 
 
   if(digitalRead(BUTTON_A_PIN) == 0) {

@@ -2,9 +2,11 @@
 #define _CBSDUPDATER_H_
 
 #include <MenuCallBack.h>
+#include <Preferences.h>
 #include <ArduinoJson.h>     // https://github.com/bblanchon/ArduinoJson/
 #include <utility/qrcode.h>
 #include "MenuItemSDUpdater.h"
+#include "GlobalParams.h"
 #include "Header.h"
 
 
@@ -45,6 +47,10 @@ public:
   bool loop()
   {
     if (cmd == M5TreeView::eCmd::ENTER) {
+      Preferences p;
+      p.begin(preferName);
+      p.putString(preferKeyLastBin, mi->name);
+      p.end();
       SDUpdater sdUpdater;
       String bin = "/" + mi->name + ".bin";
       sdUpdater.updateFromFS(SD, bin);

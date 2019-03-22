@@ -1,12 +1,18 @@
 #include "MenuItemSDUpdater.h"
+#include "GlobalParams.h"
 
 #include <M5StackUpdater.h>   // https://github.com/tobozo/M5Stack-SD-Updater/
+#include <Preferences.h>
 #include <SD.h>
 #undef min
 #include <algorithm>
 
 void MenuItemSDUpdater::onEnter() {
   if (!name.length()) {
+    Preferences p;
+    p.begin(preferName);
+    String lastBin = p.getString(preferKeyLastBin, "");
+    p.end();
     SD.end();
     SD.begin(TFCARD_CS_PIN);
     // search *.bin files from SD root.
@@ -23,6 +29,7 @@ void MenuItemSDUpdater::onEnter() {
           name = name.substring(1, idx);
           mi = new MenuItemSDUpdater(name, name);
           addItem(mi);
+          if (lastBin == name) setFocusItem(mi);
         }
       }
       file = root.openNextFile();
