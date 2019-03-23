@@ -230,6 +230,9 @@ typedef std::vector<MenuItem*> vmi;
 void setup() {
   M5.begin();
   M5.Speaker.begin();
+  dacWrite( 25, 0 ); // turn speaker signal off
+  ledcDetachPin( 25 ); // detach DAC
+
   Wire.begin();
 
 // for fire LED off
