@@ -224,6 +224,54 @@ void callBackExec(MenuItem* sender)
   menucallback(sender);
 }
 
+bool comparePartition(const esp_partition_t* src1, const esp_partition_t* src2, size_t length)
+{
+    size_t lengthLeft = length;
+    const size_t bufSize = SPI_FLASH_SEC_SIZE;
+    std::unique_ptr<uint8_t[]> buf1(new uint8_t[bufSize]);
+    std::unique_ptr<uint8_t[]> buf2(new uint8_t[bufSize]);
+    uint32_t offset = 0;
+    size_t i;
+    while( lengthLeft > 0) {
+      size_t readBytes = (lengthLeft < bufSize) ? lengthLeft : bufSize;
+      if (!ESP.flashRead(src1->address + offset, reinterpret_cast<uint32_t*>(buf1.get()), (readBytes + 3) & ~3)
+       || !ESP.flashRead(src2->address + offset, reinterpret_cast<uint32_t*>(buf2.get()), (readBytes + 3) & ~3)) {
+          return false;
+      }
+      for (i = 0; i < readBytes; ++i) if (buf1[i] != buf2[i]) return false;
+      lengthLeft -= readBytes;
+      offset += readBytes;
+    }
+    return true;
+}
+
+bool copyPartition(File* fs, const esp_partition_t* dst, const esp_partition_t* src, size_t length)
+{
+    M5.Lcd.fillRect( 110, 112, 100, 20, 0);
+    size_t lengthLeft = length;
+    const size_t bufSize = SPI_FLASH_SEC_SIZE;
+    std::unique_ptr<uint8_t[]> buf(new uint8_t[bufSize]);
+    uint32_t offset = 0;
+    uint32_t progress = 0, progressOld = 0;
+    while( lengthLeft > 0) {
+      size_t readBytes = (lengthLeft < bufSize) ? lengthLeft : bufSize;
+      if (!ESP.flashRead(src->address + offset, reinterpret_cast<uint32_t*>(buf.get()), (readBytes + 3) & ~3)
+       || !ESP.flashEraseSector((dst->address + offset) / bufSize)
+       || !ESP.flashWrite(dst->address + offset, reinterpret_cast<uint32_t*>(buf.get()), (readBytes + 3) & ~3)) {
+          return false;
+      }
+      if (fs) fs->write(buf.get(), (readBytes + 3) & ~3);
+      lengthLeft -= readBytes;
+      offset += readBytes;
+      progress = 100 * offset / length;
+      if (progressOld != progress) {
+        progressOld = progress;
+        M5.Lcd.progressBar( 110, 112, 100, 20, progress);
+      }
+    }
+    return true;
+}
+
 //======================================================================//
 typedef std::vector<MenuItem*> vmi;
 
@@ -237,12 +285,48 @@ void setup() {
   pinMode(NEOPIXEL_pin, OUTPUT);
   setNeoPixelAll(0);
 
-
   if(digitalRead(BUTTON_A_PIN) == 0) {
      Serial.println("Will Load menu binary");
      updateFromFS(SD);
      ESP.restart();
   }
+
+  const esp_partition_t *running = esp_ota_get_running_partition();
+  const esp_partition_t *nextupdate = esp_ota_get_next_update_partition(NULL);
+  constexpr char* menubinfilename {MENU_BIN} ;
+  if (!nextupdate)
+  {
+    M5.Lcd.setTextFont(4);
+    M5.Lcd.print("! WARNING !\r\nNo OTA partition.\r\nCan't use SD-Updater.");
+    delay(3000);
+  }
+  else if (running && running->label[3] == '0' && nextupdate->label[3] == '1') 
+  {
+    M5.Lcd.setTextFont(2);
+    M5.Lcd.println("LovyanLauncher on app0");
+    size_t sksize = ESP.getSketchSize();
+    if (!comparePartition(running, nextupdate, sksize))
+    {
+      bool flgSD = SD.begin( TFCARD_CS_PIN );
+      M5.Lcd.print(" copy to app1");
+      File dst;
+      if (flgSD) {
+        dst = (SD.open(menubinfilename, FILE_WRITE ));
+        M5.Lcd.print(" and SD menu.bin");
+      }
+      if (copyPartition( flgSD ? &dst : NULL, nextupdate, running, sksize)) {
+        M5.Lcd.println("\r\nDone.");
+      }
+      if (flgSD) dst.close();
+    }
+    SDUpdater::updateNVS();      
+    M5.Lcd.println("Rebooting app1...");
+    if (Update.canRollBack()) {
+      Update.rollBack();
+      ESP.restart();
+    }
+  }
+  M5.Lcd.fillScreen(0);
 
   M5ButtonDrawer::width = 106;
 
