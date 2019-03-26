@@ -15,25 +15,37 @@ void MenuItemSDUpdater::onEnter() {
     p.end();
     SD.end();
     SD.begin(TFCARD_CS_PIN);
-    // search *.bin files from SD root.
+    // search *.bin files from SD.
     deleteItems();
-    File root = SD.open("/");
+    std::vector<MenuItem*> filesItems;
+    File root = SD.open(path.length() ? path : "/");
     File file = root.openNextFile();
     MenuItemSDUpdater* mi;
     while (file) {
+      String ptmp = file.name();
+      String fn = ptmp.substring(path.length() + 1);
       if (!file.isDirectory()) {
-        String name = file.name();
-        int idx = name.lastIndexOf('.');
-        String ext = name.substring(idx + 1);
-        if (ext == "bin" && !name.startsWith("/.")) {
-          name = name.substring(1, idx);
-          mi = new MenuItemSDUpdater(name, name);
-          addItem(mi);
-          if (lastBin == name) setFocusItem(mi);
+        int idx = fn.lastIndexOf('.');
+        String ext = fn.substring(idx + 1);
+        fn = fn.substring(0, idx);
+        if (ext == "bin" && !fn.startsWith("/.")) {
+          mi = new MenuItemSDUpdater(fn, ptmp, false, fn);
+          filesItems.push_back(mi);
+          if (lastBin == fn) setFocusItem(mi);
+        }
+      } else {
+        if (fn.endsWith("bin")) {
+          addItem(new MenuItemSDUpdater(fn, ptmp, true, ""));
         }
       }
       file = root.openNextFile();
-      std::sort(Items.begin(), Items.end(), compareIgnoreCase);
+    }
+    std::sort(Items.begin(), Items.end(), compareIgnoreCase);
+
+    if (!filesItems.empty()) {
+
+      std::sort(filesItems.begin(), filesItems.end(), compareIgnoreCase);
+      addItems(filesItems);
     }
     root.close();
   }
@@ -59,6 +71,3 @@ void MenuItemSDUpdater::onDefocus() {
   }
 }
 
-void MenuItemSDUpdater::onAfterDraw()
-{
-}

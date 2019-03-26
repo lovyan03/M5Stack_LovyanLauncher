@@ -21,7 +21,7 @@ public:
 
     M5.Lcd.drawCentreString("iOS", 70, 26, 2);
     M5.Lcd.drawCentreString("Android", 250, 26, 2);
-    M5.Lcd.qrcode("https://itunes.apple.com/jp/app/id1418485613", 0, 40, 140, 3);
+    M5.Lcd.qrcode("https://itunes.apple.com/app/id1071176700", 0, 40, 140, 3);                   
     M5.Lcd.qrcode("https://play.google.com/store/apps/details?id=com.cmmakerclub.iot.esptouch", 180, 40, 140, 4);
 
     WiFi.mode(WIFI_AP_STA);

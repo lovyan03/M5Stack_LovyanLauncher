@@ -27,12 +27,11 @@ public:
     }
     M5.Lcd.drawString("SD Updater : " + mi->name, 10, 10, 2);
 
-    fileName = "/" + mi->name + ".bin";
     iconName = "/jpg/" + mi->name + ".jpg";
     faceName = "/jpg/" + mi->name + "_gh.jpg";
     metaName = "/json/" + mi->name + ".json";
 
-    File file = SD.open( fileName );
+    File file = SD.open( mi->path );
     fileSize = file.size();
     file.close();
 
@@ -52,8 +51,7 @@ public:
       p.putString(preferKeyLastBin, mi->name);
       p.end();
       SDUpdater sdUpdater;
-      String bin = "/" + mi->name + ".bin";
-      sdUpdater.updateFromFS(SD, bin);
+      sdUpdater.updateFromFS(SD, mi->path);
       ESP.restart();
     }
     if (cmd == M5TreeView::eCmd::NEXT
@@ -82,7 +80,6 @@ private:
 
   MenuItemSDUpdater* mi;
 
-  String fileName;
   String metaName;
   String iconName;
   String faceName;

@@ -87,19 +87,20 @@ void HeaderDrawer::draw()
   }
 
   wifi_mode_t mode;
-  esp_wifi_get_mode(&mode);
-  if (mode == WIFI_AP || mode == WIFI_AP_STA) {
-    x = drawStr("AP:", x);
-    x = drawStr(WiFi.softAPIP().toString(), x);
-    x = drawStr(" ", x);
-  }
-  if (mode == WIFI_STA || mode == WIFI_AP_STA) {
-    wl_status_t s = WiFi.status();
-    x = drawStr(wifiStatus(s), x);
-    x = drawStr(" ", x);
-    if (s == WL_CONNECTED) {
-      x = drawStr(WiFi.localIP().toString(), x);
+  if (ESP_OK == esp_wifi_get_mode(&mode)) {
+    if (mode == WIFI_AP || mode == WIFI_AP_STA) {
+      x = drawStr("AP:", x);
+      x = drawStr(WiFi.softAPIP().toString(), x);
       x = drawStr(" ", x);
+    }
+    if (mode == WIFI_STA || mode == WIFI_AP_STA) {
+      wl_status_t s = WiFi.status();
+      x = drawStr(wifiStatus(s), x);
+      x = drawStr(" ", x);
+      if (s == WL_CONNECTED) {
+        x = drawStr(WiFi.localIP().toString(), x);
+        x = drawStr(" ", x);
+      }
     }
   }
   int16_t cx = M5.Lcd.getCursorX();
