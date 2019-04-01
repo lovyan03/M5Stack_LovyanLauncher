@@ -34,7 +34,7 @@ void MenuItemSDUpdater::onEnter() {
           if (lastBin == fn) setFocusItem(mi);
         }
       } else {
-        if (fn.endsWith("bin")) {
+        if (fn.startsWith("bin") || fn.endsWith("bin")) {
           addItem(new MenuItemSDUpdater(fn, ptmp, true, ""));
         }
       }
@@ -52,9 +52,20 @@ void MenuItemSDUpdater::onEnter() {
   MenuItem::onEnter();
 }
 
+String MenuItemSDUpdater::getSubFilePath(String subDir, String suffix) {
+  MenuItemSDUpdater* pi = static_cast<MenuItemSDUpdater*>(_parentItem);
+  if (pi && pi->path.length()) {
+    String filename = pi->path + "/" + subDir + "/" + name + suffix;
+    if (SD.exists(filename.c_str())) {
+      return filename;
+    }
+  }
+  return "/" + subDir + "/" + name + suffix;
+}
+
 void MenuItemSDUpdater::onFocus() {
   if (name.length()) {
-    String filename = "/jpg/" + name + ".jpg";
+    String filename = getSubFilePath("jpg", ".jpg");
     if (SD.exists(filename.c_str())) {
       M5.Lcd.drawJpgFile(SD, filename.c_str(), 200, 40);
     } else {

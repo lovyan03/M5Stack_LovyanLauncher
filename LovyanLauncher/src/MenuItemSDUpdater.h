@@ -14,6 +14,8 @@ public:
   MenuItemSDUpdater(const String& t, const String& p, bool isdir, const String& n)
   : MenuItemSD(t, p, isdir), name(n) {};
 
+  String getSubFilePath(String subDir, String suffix);
+
   virtual void onFocus();
   virtual void onDefocus();
   virtual void onEnter();

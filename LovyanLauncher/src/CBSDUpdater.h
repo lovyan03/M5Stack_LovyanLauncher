@@ -26,15 +26,14 @@ public:
       M5.Lcd.drawFastHLine(0, 10 + i, M5.Lcd.width(), i << 1);
     }
     M5.Lcd.drawString("SD Updater : " + mi->name, 10, 10, 2);
-
-    iconName = "/jpg/" + mi->name + ".jpg";
-    faceName = "/jpg/" + mi->name + "_gh.jpg";
-    metaName = "/json/" + mi->name + ".json";
-
+    iconName = mi->getSubFilePath("jpg", ".jpg");
+    faceName = mi->getSubFilePath("jpg", "_gh.jpg");
+    metaName = mi->getSubFilePath("json", ".json");
+/*
     File file = SD.open( mi->path );
     fileSize = file.size();
     file.close();
-
+*/
     hasIcon = SD.exists(iconName.c_str());
     hasMeta = SD.exists(metaName.c_str());
     hasFace = SD.exists(faceName.c_str());
