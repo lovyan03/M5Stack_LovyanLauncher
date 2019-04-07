@@ -21,17 +21,21 @@ void MenuItemSDUpdater::onEnter() {
     File root = SD.open(path.length() ? path : "/");
     File file = root.openNextFile();
     MenuItemSDUpdater* mi;
+    MenuItemSDUpdater* selectmi = NULL;
+    String ptmp;
+    String fn;
+    String ext;
     while (file) {
-      String ptmp = file.name();
-      String fn = ptmp.substring(path.length() + 1);
+      ptmp = file.name();
+      fn = ptmp.substring(path.length() + 1);
       if (!file.isDirectory()) {
         int idx = fn.lastIndexOf('.');
-        String ext = fn.substring(idx + 1);
+        ext = fn.substring(idx + 1);
         fn = fn.substring(0, idx);
-        if (ext == "bin" && !fn.startsWith("/.")) {
+        if (ext == "bin" && !fn.startsWith("/.") && fn != "menu" && file.size() > 100) {
           mi = new MenuItemSDUpdater(fn, ptmp, false, fn);
           filesItems.push_back(mi);
-          if (lastBin == fn) setFocusItem(mi);
+          if (lastBin == fn) selectmi = mi;
         }
       } else {
         if (fn.startsWith("bin") || fn.endsWith("bin")) {
@@ -40,6 +44,8 @@ void MenuItemSDUpdater::onEnter() {
       }
       file = root.openNextFile();
     }
+    root.close();
+    if (selectmi) setFocusItem(selectmi);
     std::sort(Items.begin(), Items.end(), compareIgnoreCase);
 
     if (!filesItems.empty()) {
@@ -47,7 +53,6 @@ void MenuItemSDUpdater::onEnter() {
       std::sort(filesItems.begin(), filesItems.end(), compareIgnoreCase);
       addItems(filesItems);
     }
-    root.close();
   }
   MenuItem::onEnter();
 }
@@ -60,23 +65,51 @@ String MenuItemSDUpdater::getSubFilePath(String subDir, String suffix) {
       return filename;
     }
   }
-  return "/" + subDir + "/" + name + suffix;
+  return path.length()
+       ? "/" + subDir + "/" + name + suffix
+       : "";
 }
 
+static uint8_t progressDraw = 0;
+static String imageFilePath = "";
 void MenuItemSDUpdater::onFocus() {
-  if (name.length()) {
-    String filename = getSubFilePath("jpg", ".jpg");
-    if (SD.exists(filename.c_str())) {
-      M5.Lcd.drawJpgFile(SD, filename.c_str(), 200, 40);
-    } else {
+  progressDraw = (name.length()) ? 0 : 9;
+  useLowClockDelay = false;
+}
+
+void MenuItemSDUpdater::onFocusLoop() {
+  if (progressDraw > 9) return;
+  switch (progressDraw) {
+    case 1:
+      imageFilePath = getSubFilePath("jpg", ".jpg");
+      progressDraw = (imageFilePath.length()) ? 2 : 9;
+      break;
+    case 2:
+      if (SD.exists(imageFilePath.c_str())) progressDraw += 2;
+      else ++progressDraw;
+      break;
+    case 3:
       M5.Lcd.setTextColor(0xFFFF);
       M5.Lcd.drawRect(200, 40, 110, 110, 0xFFFF);
       M5.Lcd.drawCentreString("- no image -", 255, 80, 2);
-    }
+      progressDraw = 9;
+      break;
+    case 7:
+      M5.Lcd.drawJpgFile(SD, imageFilePath.c_str(), 200, 40);
+      progressDraw = 9;
+      break;
+    case 9:
+      useLowClockDelay = true;
+      ++progressDraw;
+      break;
+    default:
+      ++progressDraw;
+      break;
   }
 }
 
 void MenuItemSDUpdater::onDefocus() {
+  useLowClockDelay = true;
   if (name != "") {
     M5.Lcd.fillRect(200, 40, 120, 140, backgroundColor);
   }

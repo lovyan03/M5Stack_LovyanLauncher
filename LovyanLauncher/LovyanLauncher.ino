@@ -38,7 +38,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03    v0.1.5", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03    v0.1.6", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -186,9 +186,9 @@ void callBackBatteryIP5306CTL0(MenuItem* sender)
 }
 
 void sendNeoPixelBit(bool flg) {
-  for (int i = 0; i < 2; ++i) digitalWrite(NEOPIXEL_pin, HIGH);
-  for (int i = 0; i < 6; ++i) digitalWrite(NEOPIXEL_pin, flg);
-  for (int i = 0; i < 3; ++i) digitalWrite(NEOPIXEL_pin, LOW);
+  for (uint8_t i = 0; i < 2; ++i) digitalWrite(NEOPIXEL_pin, HIGH);
+  for (uint8_t i = 0; i < 6; ++i) digitalWrite(NEOPIXEL_pin, flg);
+  for (uint8_t i = 0; i < 3; ++i) digitalWrite(NEOPIXEL_pin, LOW);
 }
 void sendNeoPixelColor(uint32_t color) { // 24bit GRB
   for (uint8_t i = 0; i < 24; ++i) {
@@ -278,10 +278,12 @@ typedef std::vector<MenuItem*> vmi;
 void setup() {
   M5.begin();
   M5.Speaker.begin();
-
+  M5.Speaker.mute();
   Wire.begin();
+  ledcSetup(7, 44100, 8);
+  M5.Lcd.setBrightness(80);
 
-// for fire LED off
+// for M5GO Bottom LED off
   pinMode(NEOPIXEL_pin, OUTPUT);
   setNeoPixelAll(0);
 
@@ -340,6 +342,7 @@ void setup() {
   treeView.useCardKB      = true;
   treeView.useJoyStick    = true;
   treeView.usePLUSEncoder = true;
+  treeView.useLowClockDelay= true;
   osk.useFACES       = true;
   osk.useCardKB      = true;
   osk.usePLUSEncoder = true;
@@ -401,7 +404,7 @@ void setup() {
                  { new MenuItemToggle("BatteryCharge" , getIP5306REG(0) & 0x10, 0x10, callBackBatteryIP5306CTL0)
                  , new MenuItemToggle("BatteryOutput" , getIP5306REG(0) & 0x20, 0x20, callBackBatteryIP5306CTL0)
                  , new MenuItemToggle("Boot on load"  , getIP5306REG(0) & 0x04, 0x04, callBackBatteryIP5306CTL0)
-                 , new MenuItemToggle("FIRE LED", false, callBackFIRELED)
+                 , new MenuItemToggle("M5GO Bottom LED", false, callBackFIRELED)
                  , new MenuItem("DeepSleep", callBackDeepSleep)
                  })
                , new MenuItem("OTA Rollback", vmi
@@ -413,7 +416,6 @@ void setup() {
 
 uint8_t loopcnt = 0xF;
 long lastctrl = millis();
-MenuItem* miFocus;
 void loop() {
   if (NULL != treeView.update()) {
     lastctrl = millis();

@@ -4,7 +4,6 @@
 #include <MenuItemSD.h>
 
 class MenuItemSDUpdater : public MenuItemSD {
-  static uint16_t maxFileCount;
 public:
   String name;
 
@@ -17,6 +16,7 @@ public:
   String getSubFilePath(String subDir, String suffix);
 
   virtual void onFocus();
+  virtual void onFocusLoop();
   virtual void onDefocus();
   virtual void onEnter();
 };
