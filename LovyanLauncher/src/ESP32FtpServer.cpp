@@ -44,12 +44,18 @@ void FtpServer::begin(String uname, String pword)
 
 	ftpServer.begin();
 	delay(10);
-	dataServer.begin();	
+	dataServer.begin();
 	delay(10);
 	millisTimeOut = (uint32_t)FTP_TIME_OUT * 60 * 1000;
 	millisDelay = 0;
 	cmdStatus = 0;
     iniVariables();
+}
+
+void FtpServer::end()
+{
+	ftpServer.end();
+	dataServer.end();
 }
 
 void FtpServer::iniVariables()
@@ -106,12 +112,12 @@ void FtpServer::handleFTP()
   }
   else if( readChar() > 0 )         // got response
   {
-    if( cmdStatus == 3 )            // Ftp server waiting for user identity
+    if( cmdStatus == 3 ) {           // Ftp server waiting for user identity
       if( userIdentity() )
         cmdStatus = 4;
       else
         cmdStatus = 0;
-    else if( cmdStatus == 4 )       // Ftp server waiting for user registration
+    } else if( cmdStatus == 4 ) {      // Ftp server waiting for user registration
       if( userPassword() )
       {
         cmdStatus = 5;
@@ -119,11 +125,12 @@ void FtpServer::handleFTP()
       }
       else
         cmdStatus = 0;
-    else if( cmdStatus == 5 )       // Ftp server waiting for user command
+    } else if( cmdStatus == 5 ) {      // Ftp server waiting for user command
       if( ! processCommand())
         cmdStatus = 0;
       else
         millisEndConnection = millis() + millisTimeOut;
+    }
   }
   else if (!client.connected() || !client)
   {
@@ -456,7 +463,6 @@ boolean FtpServer::processCommand()
       uint16_t nm = 0;
 //      Dir dir= fs().openDir(cwdName);
       File dir= fs().open(cwdName);
-      char dtStr[ 15 ];
     //  if(!fs().exists(cwdName))
      if((!dir)||(!dir.isDirectory()))
         client.println( "550 Can't open directory " +String(cwdName) );
@@ -661,7 +667,6 @@ boolean FtpServer::processCommand()
   else if( ! strcmp( command, "RNTO" ))
   {  
     char path[ FTP_CWD_SIZE ];
-    char dir[ FTP_FIL_SIZE ];
     if( strlen( buf ) == 0 || ! rnfrCmd )
       client.println( "503 Need RNFR before RNTO");
     else if( strlen( parameters ) == 0 )
@@ -851,7 +856,7 @@ int8_t FtpServer::readChar()
     #endif
     if( c == '\\' )
       c = '/';
-    if( c != '\r' )
+    if( c != '\r' ) {
       if( c != '\n' )
       {
         if( iCL < FTP_CMD_SIZE )
@@ -892,6 +897,7 @@ int8_t FtpServer::readChar()
           iCL = 0;
         }
       }
+    }
     if( rc > 0 )
       for( uint8_t i = 0 ; i < strlen( command ); i ++ )
         command[ i ] = toupper( command[ i ] );

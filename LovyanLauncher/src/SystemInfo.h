@@ -1,11 +1,9 @@
 #ifndef _SYSTEMINFO_H_
 #define _SYSTEMINFO_H_
 
-#include <MenuCallBack.h>
-#include "Header.h"
-#include <M5PLUSEncoder.h>
-#include <M5JoyStick.h>
 #include <nvs.h>
+#include "MenuCallBack.h"
+#include "Header.h"
 
 class SystemInfo : public MenuCallBack
 {
@@ -22,7 +20,7 @@ public:
   {
     Header.draw();
     if (cmd == M5TreeView::eCmd::NEXT || cmd == M5TreeView::eCmd::PREV) {
-      page = ++page % pageCount;
+      page = (1+page) % pageCount;
       drawPage(page);
     }
     delay(10);

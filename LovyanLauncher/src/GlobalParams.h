@@ -1,7 +1,8 @@
 #ifndef _GLOBALPARAMS_H_
 #define _GLOBALPARAMS_H_
 
-constexpr char* preferName      ( "LovyanLauncher" );
-constexpr char* preferKeyLastBin( "LastBinFileName" );
-
+struct GlobalParams {
+  static constexpr char* preferName       = (char*)"LovyanLauncher";
+  static constexpr char* preferKeyLastBin = (char*)"LastBinFileName";
+};
 #endif

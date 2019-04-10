@@ -19,6 +19,7 @@
 #include "src/WiFiWPS.h"
 #include "src/BinaryViewer.h"
 #include "src/CBFTPserver.h"
+#include "src/CBArduinoOTA.h"
 #include "src/CBSDUpdater.h"
 #include "src/CBFSBench.h"
 #include "src/CBWiFiSetting.h"
@@ -28,8 +29,8 @@
 M5TreeView treeView;
 M5OnScreenKeyboard osk;
 constexpr uint8_t NEOPIXEL_pin = 15;
-constexpr char* preferKeyIP5306( "IP5306CTL0" );
-constexpr char* preferKeyStyle ( "TVStyle" );
+const char* preferKeyIP5306 PROGMEM( "IP5306CTL0" );
+const char* preferKeyStyle  PROGMEM( "TVStyle" );
 void drawFrame() {
   Rect16 r = treeView.clientRect;
   r.inflate(1);
@@ -81,7 +82,7 @@ void callBackStyle(MenuItem* sender)
 {
   setStyle(sender->tag);
   Preferences p;
-  p.begin(preferName);
+  p.begin(GlobalParams::preferName);
   p.putUChar(preferKeyStyle, sender->tag);
   p.end();
 }
@@ -179,8 +180,8 @@ void callBackBatteryIP5306CTL0(MenuItem* sender)
   uint8_t data = getIP5306REG(0);
   data = mi->value ? (data | mi->tag) : (data & ~(mi->tag));
   Preferences p;
-  p.begin(preferName);
-  p.putUChar(preferName, data);
+  p.begin(GlobalParams::preferName);
+  p.putUChar(GlobalParams::preferName, data);
   p.end();
   setIP5306REG(0, data);
 }
@@ -295,7 +296,7 @@ void setup() {
 
   const esp_partition_t *running = esp_ota_get_running_partition();
   const esp_partition_t *nextupdate = esp_ota_get_next_update_partition(NULL);
-  constexpr char* menubinfilename {MENU_BIN} ;
+  const char* menubinfilename PROGMEM {MENU_BIN} ;
   if (!nextupdate)
   {
     M5.Lcd.setTextFont(4);
@@ -342,7 +343,7 @@ void setup() {
   treeView.useCardKB      = true;
   treeView.useJoyStick    = true;
   treeView.usePLUSEncoder = true;
-  treeView.useLowClockDelay= true;
+  treeView.useLowClockDelay= false;
   osk.useFACES       = true;
   osk.useCardKB      = true;
   osk.usePLUSEncoder = true;
@@ -352,15 +353,15 @@ void setup() {
 
 // restore setting
   Preferences p;
-  p.begin(preferName, true);
-  setIP5306REG(0, p.getUChar(preferName, getIP5306REG(0))
+  p.begin(GlobalParams::preferName, true);
+  setIP5306REG(0, p.getUChar(GlobalParams::preferName, getIP5306REG(0))
                  |((getIP5306REG(0x70) & 0x04) ? 0x20: 0) ); //When using battery, Prohibit battery non-use setting.
   setStyle(p.getUChar(preferKeyStyle, 1));
   p.end();
 
   treeView.setItems(vmi
                { new MenuItemSDUpdater("SD Updater", callBackExec<CBSDUpdater>)
-               , new MenuItem("WiFi ", vmi
+               , new MenuItem("WiFi", vmi
                  { new MenuItemWiFiClient("WiFi Client", callBackWiFiClient)
                  , new MenuItem("WiFi WPS", callBackExec<WiFiWPS>)
                  , new MenuItem("WiFi SmartConfig"     , callBackExec<CBWiFiSmartConfig>)
@@ -407,9 +408,12 @@ void setup() {
                  , new MenuItemToggle("M5GO Bottom LED", false, callBackFIRELED)
                  , new MenuItem("DeepSleep", callBackDeepSleep)
                  })
-               , new MenuItem("OTA Rollback", vmi
+               , new MenuItem("OTA", vmi
+                 { new MenuItem("Arduino OTA", callBackExec<CBArduinoOTA>)
+                 , new MenuItem("OTA Rollback", vmi
                    { new MenuItem("Rollback Execute", callBackRollBack)
                    } )
+                 } )
                } );
   treeView.begin();
 }

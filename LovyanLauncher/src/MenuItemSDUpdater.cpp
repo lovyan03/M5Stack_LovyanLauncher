@@ -10,8 +10,8 @@
 void MenuItemSDUpdater::onEnter() {
   if (!name.length()) {
     Preferences p;
-    p.begin(preferName);
-    String lastBin = p.getString(preferKeyLastBin, "");
+    p.begin(GlobalParams::preferName);
+    String lastBin = p.getString(GlobalParams::preferKeyLastBin, "");
     p.end();
     SD.end();
     SD.begin(TFCARD_CS_PIN);
@@ -74,7 +74,6 @@ static uint8_t progressDraw = 0;
 static String imageFilePath = "";
 void MenuItemSDUpdater::onFocus() {
   progressDraw = (name.length()) ? 0 : 9;
-  useLowClockDelay = false;
 }
 
 void MenuItemSDUpdater::onFocusLoop() {
@@ -99,7 +98,6 @@ void MenuItemSDUpdater::onFocusLoop() {
       progressDraw = 9;
       break;
     case 9:
-      useLowClockDelay = true;
       ++progressDraw;
       break;
     default:
@@ -109,7 +107,6 @@ void MenuItemSDUpdater::onFocusLoop() {
 }
 
 void MenuItemSDUpdater::onDefocus() {
-  useLowClockDelay = true;
   if (name != "") {
     M5.Lcd.fillRect(200, 40, 120, 140, backgroundColor);
   }

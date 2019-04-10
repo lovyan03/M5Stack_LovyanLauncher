@@ -1,10 +1,10 @@
 #ifndef _BINARYVIEWER_H_
 #define _BINARYVIEWER_H_
 
-#include <MenuCallBack.h>
-#include "Header.h"
 #include <SD.h>
 #include <esp_flash_partitions.h>
+#include "MenuCallBack.h"
+#include "Header.h"
 
 class BinaryViewer : public MenuCallBack
 {
@@ -70,7 +70,7 @@ private:
     M5.Lcd.writedata(vsp>>8);
     M5.Lcd.writedata(vsp);
   }
-  bool drawAddress()
+  void drawAddress()
   {
     M5.Lcd.setCursor(0,40);
     M5.Lcd.setTextColor(0xFFE0, 0);

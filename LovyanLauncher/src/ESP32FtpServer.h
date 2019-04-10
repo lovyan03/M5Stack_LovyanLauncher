@@ -52,6 +52,7 @@ class FtpServer
 public:
   void    begin(String uname, String pword);
   void    handleFTP();
+  void    end();
 protected:
   void    iniVariables();
   void    clientConnected();

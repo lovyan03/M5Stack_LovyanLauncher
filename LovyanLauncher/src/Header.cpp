@@ -15,6 +15,7 @@ int HeaderDrawer::drawStr(const String& src, int x)
 String HeaderDrawer::wifiStatus(wl_status_t src) {
   switch (src)
   {
+  case WL_NO_SHIELD      : return "";
   case WL_IDLE_STATUS    : return "IDLE_STATUS";
   case WL_NO_SSID_AVAIL  : return "NO_SSID_AVAIL";
   case WL_SCAN_COMPLETED : return "SCAN_COMPLETED";
