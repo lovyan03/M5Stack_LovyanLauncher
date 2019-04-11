@@ -70,6 +70,7 @@ private:
         M5.Lcd.progressBar( 110, 112, 100, 20, progress / (total / 100));
       })
       .onError([](ota_error_t error) {
+        M5.Lcd.setTextColor(0xFFFF, 0);
         M5.Lcd.setTextFont(1);
         M5.Lcd.printf("Error[%u]: ", error);
         switch (error) {

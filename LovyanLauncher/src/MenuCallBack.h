@@ -17,9 +17,9 @@ struct MenuCallBack {
     menuItem = mi;
     treeView = ((M5TreeView*)(mi->topItem()));
     M5.Lcd.fillScreen(0);
+    btnDrawer.draw(true);
     btnDrawer.setText("Back","","");
     if (setup()) {
-      btnDrawer.draw(true);
       do {
         cmd = treeView->checkInput();
         btnDrawer.draw();
