@@ -67,71 +67,113 @@ protected:
   }
 
   void ExecBench() {
-    M5.Lcd.fillRect(0, 30, M5.Lcd.width(), 160, 0);
+    M5.Lcd.fillRect(0, 30, M5.Lcd.width(), 180, 0);
     showFSInfo();
     M5.Lcd.setTextFont(2);
     M5.Lcd.setTextColor(0xFFFF,0);
-    M5.Lcd.setCursor(0, 70);
+    M5.Lcd.setCursor(0, 60);
     M5.Lcd.println("Bench Start");
-    uint64_t time = getWriteTime(tmpFile, 1024, 20);
-    M5.Lcd.printf("write speed 1KiB:%7u KiB/sec\r\n", uint32_t((uint64_t)1000000 * 20 / time));
+    uint64_t time;
 
-    time = getReadTime(tmpFile, 1024, 100);
-    M5.Lcd.printf("read speed 1KiB:%7u KiB/sec\r\n", uint32_t((uint64_t)1000000 * 100 / time));
+    int loop = 8;
+    time = getWriteTime(tmpFile, 4096, loop);
+    M5.Lcd.printf("4KiB Write:%5u KiB/sec", uint32_t((uint64_t)4000000 * loop / time));
 
-    time = getWriteTime(tmpFile, 4096, 20);
-    M5.Lcd.printf("write speed 4KiB:%7u KiB/sec\r\n", uint32_t((uint64_t)4000000 * 20 / time));
+    time = getReadTime(tmpFile, 4096, loop);
+    M5.Lcd.setCursor(180, M5.Lcd.getCursorY());
+    M5.Lcd.printf("Read:%6u KiB/sec\r\n", uint32_t((uint64_t)4000000 * loop / time));
 
-    time = getReadTime(tmpFile, 4096, 100);
-    M5.Lcd.printf("read speed 4KiB:%7u KiB/sec\r\n", uint32_t((uint64_t)4000000 * 100 / time));
+    removeFile(tmpFile, loop);
 
-    time = getOpenCloseTime(tmpFile, 100);
-    M5.Lcd.printf("simple open close:%5u count/sec\r\n", uint32_t((uint64_t)1000000 * 100 / time));
+    loop = 16;
+    time = getWriteTime(tmpFile, 1024, loop);
+    M5.Lcd.printf("1KiB Write:%5u KiB/sec", uint32_t((uint64_t)1000000 * loop / time));
 
-    fs::FS& fs = getFS();
-    fs.remove(tmpFile);
+    time = getReadTime(tmpFile, 1024, loop);
+    M5.Lcd.setCursor(180, M5.Lcd.getCursorY());
+    M5.Lcd.printf("Read:%6u KiB/sec\r\n", uint32_t((uint64_t)1000000 * loop / time));
+
+    loop = 24;
+    time = getWriteTime(tmpFile, 256, loop);
+    M5.Lcd.printf("256B Write:%5u KiB/sec", uint32_t((uint64_t)250000 * loop / time));
+
+    time = getReadTime(tmpFile, 256, loop);
+    M5.Lcd.setCursor(180, M5.Lcd.getCursorY());
+    M5.Lcd.printf("Read:%6u KiB/sec\r\n", uint32_t((uint64_t)250000 * loop / time));
+
+    loop = 32;
+    time = getWriteTime(tmpFile, 64, loop);
+    M5.Lcd.printf(" 64B Write:%5u KiB/sec", uint32_t((uint64_t)62500 * loop / time));
+
+    time = getReadTime(tmpFile, 64, loop);
+    M5.Lcd.setCursor(180, M5.Lcd.getCursorY());
+    M5.Lcd.printf("Read:%6u KiB/sec\r\n", uint32_t((uint64_t)62500 * loop / time));
+
+    loop = 40;
+    time = getWriteTime(tmpFile, 16, loop);
+    M5.Lcd.printf(" 16B Write:%5u KiB/sec", uint32_t((uint64_t)15625 * loop / time));
+
+    time = getReadTime(tmpFile, 16, loop);
+    M5.Lcd.setCursor(180, M5.Lcd.getCursorY());
+    M5.Lcd.printf("Read:%6u KiB/sec\r\n", uint32_t((uint64_t)15625 * loop / time));
+
+    time = getOpenCloseTime(tmpFile, loop);
+    M5.Lcd.printf("simple open close:%4u count/sec\r\n", uint32_t((uint64_t)1000000 * loop / time));
+
+    time = removeFile(tmpFile, loop);
+    M5.Lcd.printf("simple file delete:%5u count/sec\r\n", uint32_t((uint64_t)1000000 * loop / time));
 
     M5.Lcd.println("Complete.");
   }
 
-  uint64_t getWriteTime(const String& filepath, long size, int loop) {
+  uint64_t removeFile(const String& filepath, int loop)
+  {
     fs::FS& fs = getFS();
-    fs.remove(filepath);
-    uint8_t *buf = new uint8_t[size];
+    uint64_t start = micros();
+    for (int i = 0; i < loop; ++i) {
+      fs.remove(filepath + String(i));
+    }
+    return micros() - start;
+  }
+
+  volatile uint64_t getWriteTime(const String& filepath, long size, int loop) {
+    fs::FS& fs = getFS();
+    uint8_t buf[4096];
+    uint64_t res = 0;
+    File f;
     for (int i = 0; i < size; ++i) { buf[i] = uint8_t(i & 0xFF); }
-    File file = fs.open(filepath, FILE_WRITE);
-    uint64_t start = micros();
     for ( int i = 0; i < loop; ++i) {
-      file.seek(0);
-      file.write(&buf[0], size);
+      f = fs.open(filepath + String(i), FILE_WRITE);
+      uint64_t start = micros();
+      f.write(&buf[0], size);
+      f.flush();
+      res += micros() - start;
+      f.close();
     }
-    uint64_t end = micros();
-    file.close();
-    delete[] buf;
-    return end - start;
+    return res;
   }
 
-  uint64_t getReadTime(const String& filepath, long size, int loop) {
+  volatile uint64_t getReadTime(const String& filepath, long size, int loop) {
     fs::FS& fs = getFS();
-    uint8_t *buf = new uint8_t[size];
-    File file = fs.open(filepath, FILE_READ);
-    uint64_t start = micros();
+    uint8_t buf[4096];
+    uint64_t res = 0;
+    File f;
     for ( int i = 0; i < loop; ++i) {
-      file.seek(0);
-      file.read(&buf[0], size);
+      f = fs.open(filepath + String(i), FILE_READ);
+      uint64_t start = micros();
+      f.read(&buf[0], size);
+      res += micros() - start;
+      f.close();
     }
-    uint64_t end = micros();
-    file.close();
-    delete[] buf;
-    return end - start;
+    return res;
   }
 
-  uint64_t getOpenCloseTime(const String& filepath, int loop) {
+  volatile uint64_t getOpenCloseTime(const String& filepath, int loop) {
     fs::FS& fs = getFS();
     File f;
     uint64_t start = micros();
     for ( int i = 0; i < loop; ++i) {
-      f = fs.open(filepath, FILE_READ);
+      f = fs.open(filepath + String(i), FILE_READ);
       f.close();
     }
     return micros() - start;

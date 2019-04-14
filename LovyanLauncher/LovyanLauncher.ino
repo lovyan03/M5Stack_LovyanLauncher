@@ -39,7 +39,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03    v0.1.6", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03   v0.1.7b", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -278,8 +278,8 @@ typedef std::vector<MenuItem*> vmi;
 
 void setup() {
   M5.begin();
-  M5.Speaker.begin();
-  M5.Speaker.mute();
+//  M5.Speaker.begin();
+//  M5.Speaker.mute();
   Wire.begin();
   ledcSetup(7, 44100, 8);
   M5.Lcd.setBrightness(80);

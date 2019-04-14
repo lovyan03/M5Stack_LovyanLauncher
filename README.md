@@ -29,7 +29,9 @@ M5Stack用 ランチャー by lovyan03
   * 電源オフ時の負荷接続による起動の可否設定  
   * M5GOボトムのLEDの点灯・消灯制御  
   * DeepSleepコマンドによるスリープ(USB接続中でもスリープ可)  
-* OTA Rollbackによる別パテーションアプリの起動  
+* OTA  
+  * Arduino OTA によるPCからapp0領域への書込み  
+  * OTA Rollbackによるapp0領域のアプリの起動  
   
 実際の動きを以下のツイートの動画で見る事が出来ます。  
 [機能紹介](https://twitter.com/lovyan03/status/1096966245562212352)  
