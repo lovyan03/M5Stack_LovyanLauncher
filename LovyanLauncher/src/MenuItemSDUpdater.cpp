@@ -31,6 +31,7 @@ void MenuItemSDUpdater::onEnter() {
       if (!file.isDirectory()) {
         int idx = fn.lastIndexOf('.');
         ext = fn.substring(idx + 1);
+        ext.toLowerCase();
         fn = fn.substring(0, idx);
         if (ext == "bin" && !fn.startsWith("/.") && fn != "menu" && file.size() > 100) {
           mi = new MenuItemSDUpdater(fn, ptmp, false, fn);
@@ -38,7 +39,9 @@ void MenuItemSDUpdater::onEnter() {
           if (lastBin == fn) selectmi = mi;
         }
       } else {
-        if (fn.startsWith("bin") || fn.endsWith("bin")) {
+        String ftmp = fn;
+        ftmp.toLowerCase();
+        if (ftmp.startsWith("bin") || ftmp.endsWith("bin")) {
           addItem(new MenuItemSDUpdater(fn, ptmp, true, ""));
         }
       }
