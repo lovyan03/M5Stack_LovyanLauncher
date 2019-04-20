@@ -60,8 +60,8 @@ private:
     M5.Lcd.writecommand(ILI9341_VSCRDEF); // Vertical scroll definition
     M5.Lcd.writedata(tfa >> 8);           // Top Fixed Area line count
     M5.Lcd.writedata(tfa);
-    M5.Lcd.writedata((TFT_WIDTH-tfa-bfa)>>8);  // Vertical Scrolling Area line count
-    M5.Lcd.writedata(TFT_WIDTH-tfa-bfa);
+    M5.Lcd.writedata((M5.Lcd.height()-tfa-bfa)>>8);  // Vertical Scrolling Area line count
+    M5.Lcd.writedata(M5.Lcd.height()-tfa-bfa);
     M5.Lcd.writedata(bfa >> 8);           // Bottom Fixed Area line count
     M5.Lcd.writedata(bfa);
   }
