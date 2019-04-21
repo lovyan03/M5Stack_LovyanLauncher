@@ -278,11 +278,9 @@ typedef std::vector<MenuItem*> vmi;
 
 void setup() {
   M5.begin();
-//  M5.Speaker.begin();
-//  M5.Speaker.mute();
+  M5.Speaker.begin();
+  M5.Speaker.mute();
   Wire.begin();
-  ledcSetup(7, 44100, 8);
-  M5.Lcd.setBrightness(80);
 
 // for M5GO Bottom LED off
   pinMode(NEOPIXEL_pin, OUTPUT);
@@ -355,7 +353,7 @@ void setup() {
   Preferences p;
   p.begin(GlobalParams::preferName, true);
   setIP5306REG(0, p.getUChar(GlobalParams::preferName, getIP5306REG(0))
-                 |((getIP5306REG(0x70) & 0x04) ? 0x20: 0) ); //When using battery, Prohibit battery non-use setting.
+                 |((getIP5306REG(0x70) & 0x04) ? 0x21: 0x01) ); //When using battery, Prohibit battery non-use setting.
   setStyle(p.getUChar(preferKeyStyle, 1));
   p.end();
 
