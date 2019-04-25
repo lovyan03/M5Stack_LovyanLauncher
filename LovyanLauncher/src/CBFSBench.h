@@ -193,7 +193,7 @@ class CBFSBenchSD : public CBFSBench
   void init()
   {
     SD.end();
-    SD.begin(TFCARD_CS_PIN);
+    SD.begin( TFCARD_CS_PIN, SPI, 40000000);
   }
 };
 

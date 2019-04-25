@@ -20,7 +20,7 @@ public:
     _started = false;
     if (flgSD) {
       SD.end();
-      SD.begin(TFCARD_CS_PIN);
+      SD.begin( TFCARD_CS_PIN, SPI, 40000000);
     } else {
       SPIFFS.begin();
     }

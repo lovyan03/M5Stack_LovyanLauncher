@@ -308,7 +308,8 @@ void setup() {
     size_t sksize = ESP.getSketchSize();
     if (!comparePartition(running, nextupdate, sksize))
     {
-      bool flgSD = SD.begin( TFCARD_CS_PIN );
+      bool flgSD = SD.begin( TFCARD_CS_PIN, SPI, 40000000);
+
       M5.Lcd.print(" copy to app1");
       File dst;
       if (flgSD) {

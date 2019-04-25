@@ -14,7 +14,7 @@ void MenuItemSDUpdater::onEnter() {
     String lastBin = p.getString(GlobalParams::preferKeyLastBin, "");
     p.end();
     SD.end();
-    SD.begin(TFCARD_CS_PIN);
+    SD.begin( TFCARD_CS_PIN, SPI, 40000000);
     // search *.bin files from SD.
     deleteItems();
     std::vector<MenuItem*> filesItems;
