@@ -39,7 +39,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03   v0.1.7b", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03    v0.1.7", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -155,7 +155,7 @@ void callBackDeepSleep(MenuItem* sender)
   esp_deep_sleep_start();
 }
 
-uint8_t getIP5306REG(uint8_t reg)
+uint8_t getIP5306REG(uint8_t reg, uint8_t defaultValue = 0)
 {
   Wire.beginTransmission(0x75);
   Wire.write(reg);
@@ -163,7 +163,7 @@ uint8_t getIP5306REG(uint8_t reg)
    && Wire.requestFrom(0x75, 1)) {
     return Wire.read();
   }
-  return 0;
+  return defaultValue;
 }
 
 void setIP5306REG(uint8_t reg, uint8_t data)
@@ -177,7 +177,7 @@ void setIP5306REG(uint8_t reg, uint8_t data)
 void callBackBatteryIP5306CTL0(MenuItem* sender)
 {
   MenuItemToggle* mi((MenuItemToggle*)sender); 
-  uint8_t data = getIP5306REG(0);
+  uint8_t data = getIP5306REG(0, 0x35);
   data = mi->value ? (data | mi->tag) : (data & ~(mi->tag));
   Preferences p;
   p.begin(GlobalParams::preferName);
@@ -309,7 +309,6 @@ void setup() {
     if (!comparePartition(running, nextupdate, sksize))
     {
       bool flgSD = SD.begin( TFCARD_CS_PIN, SPI, 40000000);
-
       M5.Lcd.print(" copy to app1");
       File dst;
       if (flgSD) {
@@ -342,7 +341,6 @@ void setup() {
   treeView.useCardKB      = true;
   treeView.useJoyStick    = true;
   treeView.usePLUSEncoder = true;
-  treeView.useLowClockDelay= false;
   osk.useFACES       = true;
   osk.useCardKB      = true;
   osk.usePLUSEncoder = true;
@@ -353,7 +351,7 @@ void setup() {
 // restore setting
   Preferences p;
   p.begin(GlobalParams::preferName, true);
-  setIP5306REG(0, p.getUChar(GlobalParams::preferName, getIP5306REG(0))
+  setIP5306REG(0, p.getUChar(GlobalParams::preferName, getIP5306REG(0, 0x35))
                  |((getIP5306REG(0x70) & 0x04) ? 0x21: 0x01) ); //When using battery, Prohibit battery non-use setting.
   setStyle(p.getUChar(preferKeyStyle, 1));
   p.end();
