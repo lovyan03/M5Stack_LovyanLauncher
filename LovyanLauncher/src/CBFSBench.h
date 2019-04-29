@@ -27,8 +27,10 @@ public:
   bool loop()
   {
     if (cmd == M5TreeView::eCmd::ENTER) {
+#ifndef ARDUINO_ODROID_ESP32
       btnDrawer.setText(1, "");
       btnDrawer.draw();
+#endif
       ExecBench();
     } else {
       btnDrawer.setText(1, "Execute");

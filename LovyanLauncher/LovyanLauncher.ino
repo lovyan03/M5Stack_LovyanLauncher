@@ -152,6 +152,7 @@ void callBackDeepSleep(MenuItem* sender)
 {
   M5.Lcd.setBrightness(0);
   M5.Lcd.sleep();
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_B_PIN, LOW);
   esp_deep_sleep_start();
 }
 
@@ -278,10 +279,11 @@ typedef std::vector<MenuItem*> vmi;
 
 void setup() {
   M5.begin();
+#ifndef ARDUINO_ODROID_ESP32
   M5.Speaker.begin();
   M5.Speaker.mute();
   Wire.begin();
-
+#endif
 // for M5GO Bottom LED off
   pinMode(NEOPIXEL_pin, OUTPUT);
   setNeoPixelAll(0);
@@ -398,6 +400,7 @@ void setup() {
                    , new MenuItem("spiffs",      0x182, callBackExec<BinaryViewerFlash>)
                    } )
                  } )
+#ifndef ARDUINO_ODROID_ESP32
                , new MenuItem("Power", vmi
                  { new MenuItemToggle("BatteryCharge" , getIP5306REG(0) & 0x10, 0x10, callBackBatteryIP5306CTL0)
                  , new MenuItemToggle("BatteryOutput" , getIP5306REG(0) & 0x20, 0x20, callBackBatteryIP5306CTL0)
@@ -405,6 +408,7 @@ void setup() {
                  , new MenuItemToggle("M5GO Bottom LED", false, callBackFIRELED)
                  , new MenuItem("DeepSleep", callBackDeepSleep)
                  })
+#endif
                , new MenuItem("OTA", vmi
                  { new MenuItem("Arduino OTA", callBackExec<CBArduinoOTA>)
                  , new MenuItem("OTA Rollback", vmi
@@ -427,9 +431,11 @@ void loop() {
   }
   if (0 == (++loopcnt & 0xF)) {
     Header.draw();
+#ifndef ARDUINO_ODROID_ESP32
     if ( 600000 < millis() - lastctrl ) {
       Serial.println( "goto sleep" );
       callBackDeepSleep(NULL);
     }
+#endif
   }
 }

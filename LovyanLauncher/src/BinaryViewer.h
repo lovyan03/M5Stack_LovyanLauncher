@@ -29,6 +29,11 @@ public:
 
     if (0 != move) {
       firstdisplayline += move;
+#ifdef ARDUINO_ODROID_ESP32
+      for (int i = 0; i < DISPLAYLINES; ++i) {
+        drawData(i, (firstdisplayline + i) * 16);
+      }
+#else
       setupScrollArea(hHeader, hFooter);
       scroll(hHeader + (firstdisplayline % DISPLAYLINES) * 10);
       if (move == 1) {
@@ -36,6 +41,7 @@ public:
       } else {
         drawData((firstdisplayline % DISPLAYLINES), firstdisplayline * 16);
       }
+#endif
       drawAddress();
     } else {
       delay(10);

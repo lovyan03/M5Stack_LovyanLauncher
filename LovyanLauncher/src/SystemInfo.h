@@ -10,6 +10,7 @@ class SystemInfo : public MenuCallBack
 public:
   bool setup()
   {
+    btnDrawer.setText(1, "Page");
     btnDrawer.setText(2, "Page");
     page = 0;
     drawPage(page);
@@ -19,7 +20,7 @@ public:
   bool loop()
   {
     Header.draw();
-    if (cmd == M5TreeView::eCmd::NEXT || cmd == M5TreeView::eCmd::PREV) {
+    if (cmd == M5TreeView::eCmd::NEXT || cmd == M5TreeView::eCmd::PREV || cmd == M5TreeView::eCmd::ENTER) {
       page = (1+page) % pageCount;
       drawPage(page);
     }

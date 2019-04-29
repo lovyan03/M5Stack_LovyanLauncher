@@ -17,16 +17,20 @@ struct MenuCallBack {
     menuItem = mi;
     treeView = ((M5TreeView*)(mi->topItem()));
     M5.Lcd.fillScreen(0);
+#ifndef ARDUINO_ODROID_ESP32
     btnDrawer.draw(true);
+#endif
     btnDrawer.setText("Back","","");
     if (setup()) {
       do {
         cmd = treeView->checkInput();
+#ifndef ARDUINO_ODROID_ESP32
         btnDrawer.draw();
+#endif
       } while (cmd != M5TreeView::eCmd::BACK && loop());
       close();
-      M5.Lcd.fillScreen(MenuItem::backgroundColor);
     }
+    M5.Lcd.fillScreen(MenuItem::backgroundColor);
   }
   virtual bool setup() { return true; };
   virtual bool loop()  { return false; };

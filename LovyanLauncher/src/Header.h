@@ -13,10 +13,8 @@ public:
 
   void draw();
 private:
-  int drawStr(const String& src, int x);
   String wifiStatus(wl_status_t src);
-  bool readReg(uint8_t* res, uint8_t addr, uint8_t reg);
-  const uint8_t IP5306_ADDR = 0x75;
+  int drawBatteryIcon(int x);
 };
 
 extern HeaderDrawer Header;
