@@ -279,7 +279,9 @@ typedef std::vector<MenuItem*> vmi;
 
 void setup() {
   M5.begin();
-#ifndef ARDUINO_ODROID_ESP32
+#ifdef ARDUINO_ODROID_ESP32
+  M5.battery.begin();
+#else
   M5.Speaker.begin();
   M5.Speaker.mute();
   Wire.begin();
