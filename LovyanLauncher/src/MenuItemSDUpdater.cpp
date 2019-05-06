@@ -33,7 +33,7 @@ void MenuItemSDUpdater::onEnter() {
         ext = fn.substring(idx + 1);
         ext.toLowerCase();
         fn = fn.substring(0, idx);
-        if (ext == "bin" && !fn.startsWith("/.") && fn != "menu" && file.size() > 100) {
+        if (ext == "bin" && !fn.startsWith(".") && fn != "menu" && file.size() > 100) {
           mi = new MenuItemSDUpdater(fn, ptmp, false, fn);
           filesItems.push_back(mi);
           if (lastBin == fn) selectmi = mi;
