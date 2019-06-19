@@ -1,7 +1,25 @@
+/*----------------------------------------------------------------------------/
+  LovyanLauncher - M5Stack Tools & Application Launcher  
+
+## Original Source
+ https://github.com/lovyan03/M5Stack_LovyanLauncher/  
+
+## Licence
+[LGPL v2.1](https://github.com/lovyan03/M5Stack_LovyanLauncher/blob/master/LICENSE)  
+
+## Requirement
+ https://github.com/tobozo/M5Stack-SD-Updater/  
+ https://github.com/bblanchon/ArduinoJson/  
+ https://github.com/lovyan03/M5Stack_TreeView/  
+ https://github.com/lovyan03/M5Stack_OnScreenKeyboard/  
+
+## Author
+[lovyan03](https://twitter.com/lovyan03)  
+/----------------------------------------------------------------------------*/
 #include <vector>
 #include <M5Stack.h>
 #include <M5StackUpdater.h>     // https://github.com/tobozo/M5Stack-SD-Updater/
-#include <M5TreeView.h>         // https://github.com/lovyan03/M5Stack_TreeView
+#include <M5TreeView.h>         // https://github.com/lovyan03/M5Stack_TreeView/
 #include <M5OnScreenKeyboard.h> // https://github.com/lovyan03/M5Stack_OnScreenKeyboard/
 #include <MenuItemSD.h>
 #include <MenuItemSPIFFS.h>
