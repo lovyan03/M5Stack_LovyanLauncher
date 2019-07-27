@@ -19,6 +19,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 //  2017: modified by @robo8080
+//  2019: modified by @lovyan03
 
 /*******************************************************************************
  **                                                                            **
