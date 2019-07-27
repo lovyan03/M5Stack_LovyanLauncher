@@ -39,7 +39,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03    v0.1.7", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03    v0.1.8", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -345,10 +345,12 @@ void setup() {
   treeView.useCardKB      = true;
   treeView.useJoyStick    = true;
   treeView.usePLUSEncoder = true;
+  treeView.useFACESEncoder= true;
   osk.useFACES       = true;
   osk.useCardKB      = true;
-  osk.usePLUSEncoder = true;
   osk.useJoyStick    = true;
+  osk.usePLUSEncoder = true;
+  osk.useFACESEncoder= true;
 
   drawFrame();
 
