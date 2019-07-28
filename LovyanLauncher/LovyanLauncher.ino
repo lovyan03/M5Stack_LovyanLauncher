@@ -311,14 +311,7 @@ void setup() {
 // for M5GO Bottom LED off
   pinMode(NEOPIXEL_pin, OUTPUT);
   setNeoPixelAll(0);
-/*
-  if(digitalRead(BUTTON_A_PIN) == 0) {
-     Serial.println("Will Load menu binary");
-     updateFromFS(SD);
-     ESP.restart();
-  }
-//*/
-/*
+
   const esp_partition_t *running = esp_ota_get_running_partition();
   const esp_partition_t *nextupdate = esp_ota_get_next_update_partition(NULL);
   const char* menubinfilename PROGMEM {MENU_BIN} ;
@@ -354,7 +347,6 @@ void setup() {
       ESP.restart();
     }
   }
-//*/
   M5.Lcd.fillScreen(0);
 
   M5ButtonDrawer::width = 106;

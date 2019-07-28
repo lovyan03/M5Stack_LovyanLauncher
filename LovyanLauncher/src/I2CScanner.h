@@ -43,7 +43,7 @@ public:
       uint16_t color = exist ? 0xFFFF : 0x39E7;
       M5.Lcd.setTextColor(color, 0);
       if (_addr == adr) {
-        color = 0xFFE0;
+        color = 0x421F;
       }
       M5.Lcd.drawRect(x,y,19,19, color);
       M5.Lcd.printf("%02X", adr);
