@@ -66,13 +66,13 @@ public:
         if (idx >= ex.size()) idx = ex.size() - 1;
       }
     }
-    _addr = ex[idx];
+    if (idx < ex.size()) _addr = ex[idx];
 
     return true;
   }
 
 private:
-  uint8_t _addr = 0xFF;
+  uint8_t _addr = 0;
 };
 
 #endif
