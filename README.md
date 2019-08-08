@@ -68,7 +68,7 @@ FACES/JoyStick/PLUSEncoder/CardKB にも対応しています。
 
 ## Licence
 
-[LGPL v2.1](https://github.com/lovyan03/M5Stack_LovyanLauncher/blob/master/LICENSE)  
+[MIT](https://github.com/lovyan03/M5Stack_LovyanLauncher/blob/master/LICENSE)  
 
 ## Author
 

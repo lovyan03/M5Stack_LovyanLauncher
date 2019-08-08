@@ -8,7 +8,7 @@ Original Source
  https://github.com/lovyan03/M5Stack_LovyanLauncher/  
 
 Licence
- [LGPL v2.1](https://github.com/lovyan03/M5Stack_LovyanLauncher/blob/master/LICENSE)  
+ [MIT](https://github.com/lovyan03/M5Stack_LovyanLauncher/blob/master/LICENSE)  
 
 Requirement
  https://github.com/tobozo/M5Stack-SD-Updater/  
@@ -373,8 +373,8 @@ void setup() {
 // restore setting
   Preferences p;
   p.begin(GlobalParams::preferName, true);
-  setIP5306REG(0, p.getUChar(GlobalParams::preferName, getIP5306REG(0, 0x35))
-                 |((getIP5306REG(0x70) & 0x04) ? 0x21: 0x01) ); //When using battery, Prohibit battery non-use setting.
+  setIP5306REG(0, 0xFD & (p.getUChar(GlobalParams::preferName, getIP5306REG(0, 0x35))
+                 |((getIP5306REG(0x70) & 0x04) ? 0x21: 0x01))); //When using battery, Prohibit battery non-use setting.
   setStyle(p.getUChar(preferKeyStyle, 1));
   p.end();
 
