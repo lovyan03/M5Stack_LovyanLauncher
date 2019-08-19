@@ -19,6 +19,7 @@ public:
     M5.Lcd.drawString(menuItem->title, 10, 10, 2);
     _started = false;
     if (WiFi.status() != WL_CONNECTED) {
+      WiFi.mode(WIFI_MODE_STA);
       WiFi.begin();
       M5.Lcd.drawString("WiFi waiting...", 10, 60, 1);
     }

@@ -43,6 +43,7 @@ void FtpServer::begin(String uname, String pword)
 	_FTP_PASS = pword;
 
 	ftpServer.begin();
+	ftpServer.setNoDelay( true );
 	delay(10);
 	dataServer.begin();
 	delay(10);
@@ -704,7 +705,9 @@ boolean FtpServer::processCommand()
   //
   else if (!strcmp(command, "MDTM"))
   {
-	  client.println("550 Unable to retrieve time");
+    client.print("213 ");
+    client.println(parameters);
+//	client.println("550 Unable to retrieve time");
   }
 
   //
