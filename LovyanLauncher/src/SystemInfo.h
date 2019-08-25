@@ -74,8 +74,8 @@ private:
       print("Flash Frequency", "%3d MHz", ESP.getFlashChipSpeed() / 1000000);
       print("Flash Chip Size", "%d Byte", ESP.getFlashChipSize());
       print("ESP-IDF version", "%s",    esp_get_idf_version());
-      print("LCD Type", "%s",    lcd_version ? "IPS (new version)" : "TFT (old version)");
-      print("IMU Type", "%s",    get_imu_type());
+      print("LCD Type",        "%s",    lcd_version ? "new IPS version" : "old TN version");
+      print("IMU Type",        "%s",    get_imu_type());
 
       title("Mac Address");
       uint8_t mac[6];
@@ -117,7 +117,7 @@ private:
     bool res = 0;
     pinMode(TFT_RST, INPUT_PULLDOWN);
     delay(1);
-    if(digitalRead(TFT_RST)) {
+    if (digitalRead(TFT_RST)) {
       res = 1;
     } 
     pinMode(TFT_RST, OUTPUT);
@@ -125,26 +125,33 @@ private:
   }
 
   String get_imu_type() const {
-    Wire.beginTransmission(0x68);
-    Wire.write(0x75);
-    if (Wire.endTransmission(false) == 0
-     && Wire.requestFrom(0x68, (uint8_t)1)) {
-      switch (Wire.read()) {
-      case 0x19: return "MPU-6886";
-      case 0x68: return "MPU-6050";
-      case 0x71: return "MPU-9250";
-      default:  return "MPU-????";
+    String res;
+    uint8_t tmp;
+    if (M5.I2C.readByte(0x68, 0x75, &tmp)) {
+      switch (tmp) {
+      case 0x19: res = "MPU-6886"; break;
+      case 0x68: res = "MPU-6050"; break;
+      case 0x71: res = "MPU-9250"; break;
+      default:   res = "MPU-????"; break;
       }
+    } else if (M5.I2C.readByte(0x6C, 0x30, &tmp)) {
+      switch (tmp) {
+      case 0x18: res = "SH200Q";
+      default:   res = "SH????";
+      }
+    } else {
+      res = "not found";
     }
 
-    byte dummy;
-    Wire.beginTransmission(0x6C);
-    Wire.write(&dummy, 0);
-    if (Wire.endTransmission(false) == 0) {
-      return "SH200Q";
+    if (M5.I2C.readByte(0x0E, 0x07, &tmp)) {
+      if (tmp == 0xC4) res += " + MAG3110";
+      else             res += " + MAG????";
     }
-
-    return "unknown";
+    if (M5.I2C.readByte(0x10, 0x40, &tmp)) {
+      if (tmp == 0x32) res += " + BMM150";
+      else             res += " + BMM???";
+    }
+    return res;
   }
 };
 
