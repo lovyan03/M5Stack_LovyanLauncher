@@ -13,7 +13,7 @@ public:
     menuItem = mi;
     treeView = ((M5TreeView*)(mi->topItem()));
     M5.Lcd.fillScreen(0);
-    btnDrawer.setText("Back","","");
+    btnDrawer.setText("Back","Mode","Mode");
     btnDrawer.draw(true);
     if (setup()) {
       while (loop());
@@ -42,6 +42,8 @@ public:
       M5.Lcd.setCursor(20+i*19, 30);
       M5.Lcd.printf("x%01X", i);
     }
+    step = 0;
+
     return true;
   }
 
@@ -49,18 +51,29 @@ public:
   {
     M5.update();
     if (M5.BtnA.wasReleased()) return false;
-
+    if (M5.BtnB.wasReleased() || M5.BtnC.wasReleased() || step == 0) {
+      step = M5.BtnB.wasReleased() ? step << 1 : step >> 1;
+      if (step == 0) step = 16;
+      else if (step >= 32) step = 1;
+      M5.Lcd.setTextFont(2);
+      M5.Lcd.setTextSize(1);
+      M5.Lcd.setCursor(32, 160);
+      M5.Lcd.setTextColor(0xFFFF, 0);
+      M5.Lcd.printf("%2d Byte read mode ", step);
+    }
     Header.draw();
     btnDrawer.draw();
 
     M5.Lcd.setTextFont(1);
     M5.Lcd.setTextSize(1);
+    bool enabled;
     for (byte row = 0; row < regMax/16; ++row) {
-      Wire.beginTransmission(addr);
-      Wire.write(row * 16);
-      bool enabled = (Wire.endTransmission(false) == 0 && Wire.requestFrom(addr, (uint8_t)16));
-
       for (byte col = 0; col < 16; ++col) {
+        if ((col % step) == 0) {
+          Wire.beginTransmission(addr);
+          Wire.write(row * 16 + col);
+          enabled = (Wire.endTransmission(false) == 0 && Wire.requestFrom(addr, (uint8_t)(step ? step:16)));
+        }
         int reg = col + row * 16;
         int x = 20 + col * 19;
         int y = 42 + row * 14;
@@ -89,6 +102,7 @@ protected:
   M5ButtonDrawer btnDrawer;
   M5TreeView* treeView;
   MenuItem* menuItem;
+  uint8_t step = 0;
 
   virtual String getTitle() {
     return "I2C 0x" + String(addr,HEX) + " REGISTRY ";
