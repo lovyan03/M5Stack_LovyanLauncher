@@ -135,7 +135,10 @@ private:
       default:   res = "MPU-????"; break;
       }
     } else if (M5.I2C.readByte(0x6C, 0x30, &tmp)) {
-      res = "SH200Q";
+      switch (tmp) {
+      case 0x18: res = "SH200Q";
+      default:   res = "SH????";
+      }
     } else {
       res = "not found";
     }
