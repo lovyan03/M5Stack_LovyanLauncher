@@ -10,6 +10,8 @@ class SystemInfo : public MenuCallBack
 public:
   bool setup()
   {
+    lcd_version = lcd_ver();
+    M5.Lcd.begin();
     btnDrawer.setText(1, "Page");
     btnDrawer.setText(2, "Page");
     page = 0;
@@ -29,6 +31,7 @@ public:
   }
 
 private:
+  bool lcd_version;
   int page;
   const int pageCount = 2;
   void title(const char* title) {
@@ -71,11 +74,13 @@ private:
       print("Flash Frequency", "%3d MHz", ESP.getFlashChipSpeed() / 1000000);
       print("Flash Chip Size", "%d Byte", ESP.getFlashChipSize());
       print("ESP-IDF version", "%s",    esp_get_idf_version());
+      print("LCD Type",        "%s",    lcd_version ? "IPS" : "TN");
+      print("IMU Type",        "%s",    get_imu_type().c_str());
 
       title("Mac Address");
       uint8_t mac[6];
       esp_base_mac_addr_get(mac);            print("Base Mac Address");printMac(mac);
-      esp_efuse_mac_get_default(mac);        print("Default");printMac(mac);
+      //esp_efuse_mac_get_default(mac);        print("Default");printMac(mac);
       esp_read_mac(mac, ESP_MAC_WIFI_STA);   print("Wi-Fi Station");printMac(mac);
       esp_read_mac(mac, ESP_MAC_WIFI_SOFTAP);print("Wi-Fi Soft AP");printMac(mac);
       esp_read_mac(mac, ESP_MAC_BT);         print("Bluetooth");printMac(mac);
@@ -106,6 +111,45 @@ private:
   }
   void printMac(uint8_t* mac) {
     M5.Lcd.printf("%02X:%02X:%02X:%02X:%02X:%02X\r\n", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  }
+
+  bool lcd_ver() const {
+    bool res = 0;
+    pinMode(TFT_RST, INPUT_PULLDOWN);
+    delay(1);
+    if (digitalRead(TFT_RST)) {
+      res = 1;
+    } 
+    pinMode(TFT_RST, OUTPUT);
+    return res;
+  }
+
+  String get_imu_type() const {
+    String res;
+    uint8_t tmp;
+    if (M5.I2C.readByte(0x68, 0x75, &tmp)) {
+      switch (tmp) {
+      case 0x19: res = "MPU-6886"; break;
+      case 0x68: res = "MPU-6050"; break;
+      case 0x71: res = "MPU-9250"; break;
+      default:   res = "MPU-????"; break;
+      }
+    } else if (M5.I2C.readByte(0x6C, 0x30, &tmp)) {
+      switch (tmp) {
+      case 0x18: res = "SH200Q";
+      default:   res = "SH????";
+      }
+    } else {
+      res = "not found";
+    }
+
+    if (M5.I2C.readByte(0x0E, 0x07, &tmp)) {
+      res += " + MAG3110";
+    }
+    if (M5.I2C.readByte(0x10, 0x40, &tmp)) {
+      res += " + BMM150";
+    }
+    return res;
   }
 };
 

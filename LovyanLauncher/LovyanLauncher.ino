@@ -61,7 +61,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03    v0.1.9", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03    v0.2.0", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
