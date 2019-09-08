@@ -61,7 +61,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03    v0.2.0", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03    v0.2.1", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -119,7 +119,8 @@ void callBackWiFiClient(MenuItem* sender)
   Preferences preferences;
   preferences.begin("wifi-config");
   preferences.putString("WIFI_SSID", mi->ssid);
-  String wifi_passwd = preferences.getString("WIFI_PASSWD");
+  String wifi_passwd = preferences.getString(mi->ssid.c_str());
+  if (wifi_passwd == "") wifi_passwd = preferences.getString("WIFI_PASSWD");
 
   WiFi.disconnect();
   WiFi.mode(WIFI_MODE_STA);
@@ -130,6 +131,7 @@ void callBackWiFiClient(MenuItem* sender)
     osk.close();
     WiFi.begin(mi->ssid.c_str(), wifi_passwd.c_str());
     preferences.putString("WIFI_PASSWD", wifi_passwd);
+    preferences.putString(mi->ssid.c_str(), wifi_passwd);
   } else {
     WiFi.begin(mi->ssid.c_str(), "");
     preferences.putString("WIFI_PASSWD", "");
