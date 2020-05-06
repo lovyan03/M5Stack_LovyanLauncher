@@ -40,6 +40,7 @@ Author
 #include "src/I2CScanner.h"
 #include "src/WiFiWPS.h"
 #include "src/BinaryViewer.h"
+#include "src/CBImageViewer.h"
 #include "src/CBFTPserver.h"
 #include "src/CBArduinoOTA.h"
 #include "src/CBSDUpdater.h"
@@ -61,7 +62,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03    v0.2.1", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03    v0.2.3", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -421,6 +422,10 @@ void setup() {
                    , new MenuItem("eeprom",      0x199, callBackExec<BinaryViewerFlash>)
                    , new MenuItem("spiffs",      0x182, callBackExec<BinaryViewerFlash>)
                    } )
+                 } )
+               , new MenuItem("Image Viewer", vmi
+                 { new MenuItemSD(    "SDCard", callBackExec<CBImageViewer>)
+                 , new MenuItemSPIFFS("SPIFFS", callBackExec<CBImageViewer>)
                  } )
 #ifndef ARDUINO_ODROID_ESP32
                , new MenuItem("Power", vmi

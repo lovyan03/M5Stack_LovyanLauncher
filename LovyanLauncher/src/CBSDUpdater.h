@@ -3,7 +3,6 @@
 
 #include <Preferences.h>
 #include <ArduinoJson.h>     // https://github.com/bblanchon/ArduinoJson/
-#include <utility/qrcode.h>
 #include "MenuCallBack.h"
 #include "MenuItemSDUpdater.h"
 #include "GlobalParams.h"

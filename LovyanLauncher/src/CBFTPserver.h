@@ -80,7 +80,7 @@ private:
 class CBFTPserverSD : public CBFTPserver
 {
   FtpServer ftpSrv;
-  bool isSD() { return true; }
+  bool isSD() override { return true; }
   FtpServer* getFTPServ() {
     return &ftpSrv;
   }

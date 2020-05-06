@@ -63,18 +63,24 @@ protected:
   virtual int getData(int pos, uint8_t* buf) { return false; }
 private:
   void setupScrollArea(uint16_t tfa, uint16_t bfa) {
-    M5.Lcd.writecommand(ILI9341_VSCRDEF); // Vertical scroll definition
+    static constexpr uint32_t VSCRDEF = 0x33;
+    M5.Lcd.startWrite();
+    M5.Lcd.writecommand(VSCRDEF); // Vertical scroll definition
     M5.Lcd.writedata(tfa >> 8);           // Top Fixed Area line count
     M5.Lcd.writedata(tfa);
     M5.Lcd.writedata((M5.Lcd.height()-tfa-bfa)>>8);  // Vertical Scrolling Area line count
     M5.Lcd.writedata(M5.Lcd.height()-tfa-bfa);
     M5.Lcd.writedata(bfa >> 8);           // Bottom Fixed Area line count
     M5.Lcd.writedata(bfa);
+    M5.Lcd.endWrite();
   }
   void scroll(uint16_t vsp) {
-    M5.Lcd.writecommand(ILI9341_VSCRSADD); // Vertical scrolling pointer
+    static constexpr uint32_t VSCRSADD = 0x37;
+    M5.Lcd.startWrite();
+    M5.Lcd.writecommand(VSCRSADD); // Vertical scrolling pointer
     M5.Lcd.writedata(vsp>>8);
     M5.Lcd.writedata(vsp);
+    M5.Lcd.endWrite();
   }
   void drawAddress()
   {

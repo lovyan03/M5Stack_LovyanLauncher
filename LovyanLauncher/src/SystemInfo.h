@@ -115,12 +115,12 @@ private:
 
   bool lcd_ver() const {
     bool res = 0;
-    pinMode(TFT_RST, INPUT_PULLDOWN);
+    pinMode(33, INPUT_PULLDOWN);
     delay(1);
-    if (digitalRead(TFT_RST)) {
+    if (digitalRead(33)) {
       res = 1;
     } 
-    pinMode(TFT_RST, OUTPUT);
+    pinMode(33, OUTPUT);
     return res;
   }
 
