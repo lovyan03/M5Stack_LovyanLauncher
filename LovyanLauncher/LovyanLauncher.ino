@@ -34,6 +34,8 @@ Author
 #include <esp_partition.h>
 #include <nvs_flash.h>
 
+void cleanup();
+
 #include "src/MenuItemSDUpdater.h"
 #include "src/Header.h"
 #include "src/SystemInfo.h"
@@ -239,6 +241,7 @@ void callBackFIRELED(MenuItem* sender)
 void callBackRollBack(MenuItem* sender)
 {
   if( Update.canRollBack() )  {
+    cleanup();
     Update.rollBack();
     ESP.restart();
   }
@@ -297,6 +300,10 @@ bool copyPartition(File* fs, const esp_partition_t* dst, const esp_partition_t* 
       }
     }
     return true;
+}
+
+void cleanup() {
+  M5.Speaker.end();
 }
 
 //======================================================================//

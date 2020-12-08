@@ -50,6 +50,7 @@ public:
       p.end();
       SDUpdater sdUpdater;
       sdUpdater.updateFromFS(SD, mi->path);
+      cleanup();
       ESP.restart();
     }
     if (cmd == M5TreeView::eCmd::NEXT
