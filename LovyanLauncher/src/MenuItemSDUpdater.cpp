@@ -26,7 +26,11 @@ void MenuItemSDUpdater::onEnter() {
     String fn;
     String ext;
     while (file) {
-      ptmp = file.name();
+      #if defined ESP_IDF_VERSION_MAJOR && ESP_IDF_VERSION_MAJOR >= 4
+        ptmp = file.path();
+      #else
+        ptmp = file.name();
+      #endif
       fn = ptmp.substring(path.length() + 1);
       if (!file.isDirectory()) {
         int idx = fn.lastIndexOf('.');

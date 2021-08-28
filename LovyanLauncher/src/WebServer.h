@@ -126,7 +126,11 @@ public:
 
 template<typename T> size_t streamFile(T &file, const String& contentType){
   setContentLength(file.size());
+  #if defined ESP_IDF_VERSION_MAJOR && ESP_IDF_VERSION_MAJOR >= 4
+  if (String(file.path()).endsWith(".gz") &&
+  #else
   if (String(file.name()).endsWith(".gz") &&
+  #endif
       contentType != "application/x-gzip" &&
       contentType != "application/octet-stream"){
     sendHeader("Content-Encoding", "gzip");
