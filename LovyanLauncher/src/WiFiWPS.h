@@ -20,7 +20,7 @@ public:
   #define ESP_DEVICE_NAME   "ESP STATION"
 
   void wpsInitConfig(){
-    wps_config.crypto_funcs = &g_wifi_default_wps_crypto_funcs;
+    //wps_config.crypto_funcs = &g_wifi_default_wps_crypto_funcs;
     wps_config.wps_type = ESP_WPS_MODE;
     strcpy(wps_config.factory_info.manufacturer, ESP_MANUFACTURER);
     strcpy(wps_config.factory_info.model_number, ESP_MODEL_NUMBER);
@@ -37,7 +37,7 @@ public:
     return (String)wps_pin;
   }
 
-  static void WiFiEvent(WiFiEvent_t event, system_event_info_t info){
+  static void WiFiEvent(WiFiEvent_t event, WiFiEventInfo_t info){
     if (closing) return;
     M5.Lcd.setTextFont(0);
     M5.Lcd.setTextFont(2);
@@ -74,7 +74,7 @@ public:
         esp_wifi_wps_start(0);
         break;
       case SYSTEM_EVENT_STA_WPS_ER_PIN:
-        M5.Lcd.println("WPS_PIN = " + wpspin2string(info.sta_er_pin.pin_code));
+        M5.Lcd.println("WPS_PIN = " + wpspin2string(info.wps_er_pin.pin_code));
         break;
       default:
         break;
