@@ -3,7 +3,6 @@
 
 #include <Preferences.h>
 #include <ArduinoJson.h>     // https://github.com/bblanchon/ArduinoJson/
-#include <utility/qrcode.h>
 #include "MenuCallBack.h"
 #include "MenuItemSDUpdater.h"
 #include "GlobalParams.h"
@@ -51,6 +50,7 @@ public:
       p.end();
       SDUpdater sdUpdater;
       sdUpdater.updateFromFS(SD, mi->path);
+      cleanup();
       ESP.restart();
     }
     if (cmd == M5TreeView::eCmd::NEXT

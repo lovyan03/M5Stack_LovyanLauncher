@@ -66,6 +66,7 @@ private:
       })
       .onEnd([]() {
         M5.Lcd.println("\nEnd");
+        cleanup();
       })
       .onProgress([](unsigned int progress, unsigned int total) {
         M5.Lcd.progressBar( 110, 112, 100, 20, progress / (total / 100));

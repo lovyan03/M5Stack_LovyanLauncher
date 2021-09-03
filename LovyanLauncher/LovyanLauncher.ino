@@ -34,12 +34,15 @@ Author
 #include <esp_partition.h>
 #include <nvs_flash.h>
 
+void cleanup();
+
 #include "src/MenuItemSDUpdater.h"
 #include "src/Header.h"
 #include "src/SystemInfo.h"
 #include "src/I2CScanner.h"
 #include "src/WiFiWPS.h"
 #include "src/BinaryViewer.h"
+#include "src/CBImageViewer.h"
 #include "src/CBFTPserver.h"
 #include "src/CBArduinoOTA.h"
 #include "src/CBSDUpdater.h"
@@ -61,7 +64,7 @@ void drawFrame() {
   M5.Lcd.setTextFont(0);
   M5.Lcd.setTextColor(0x8410,0);
   M5.Lcd.drawString("- LovyanLauncher -", 207, 191, 1);
-  M5.Lcd.drawString("@lovyan03    v0.2.0", 204, 201, 1);
+  M5.Lcd.drawString("@lovyan03    v0.2.3", 204, 201, 1);
   M5.Lcd.drawString("http://git.io/fhdJV", 204, 211, 1);
 }
 
@@ -119,7 +122,8 @@ void callBackWiFiClient(MenuItem* sender)
   Preferences preferences;
   preferences.begin("wifi-config");
   preferences.putString("WIFI_SSID", mi->ssid);
-  String wifi_passwd = preferences.getString("WIFI_PASSWD");
+  String wifi_passwd = preferences.getString(mi->ssid.c_str());
+  if (wifi_passwd == "") wifi_passwd = preferences.getString("WIFI_PASSWD");
 
   WiFi.disconnect();
   WiFi.mode(WIFI_MODE_STA);
@@ -130,6 +134,7 @@ void callBackWiFiClient(MenuItem* sender)
     osk.close();
     WiFi.begin(mi->ssid.c_str(), wifi_passwd.c_str());
     preferences.putString("WIFI_PASSWD", wifi_passwd);
+    preferences.putString(mi->ssid.c_str(), wifi_passwd);
   } else {
     WiFi.begin(mi->ssid.c_str(), "");
     preferences.putString("WIFI_PASSWD", "");
@@ -236,6 +241,7 @@ void callBackFIRELED(MenuItem* sender)
 void callBackRollBack(MenuItem* sender)
 {
   if( Update.canRollBack() )  {
+    cleanup();
     Update.rollBack();
     ESP.restart();
   }
@@ -294,6 +300,10 @@ bool copyPartition(File* fs, const esp_partition_t* dst, const esp_partition_t* 
       }
     }
     return true;
+}
+
+void cleanup() {
+  M5.Speaker.end();
 }
 
 //======================================================================//
@@ -419,6 +429,10 @@ void setup() {
                    , new MenuItem("eeprom",      0x199, callBackExec<BinaryViewerFlash>)
                    , new MenuItem("spiffs",      0x182, callBackExec<BinaryViewerFlash>)
                    } )
+                 } )
+               , new MenuItem("Image Viewer", vmi
+                 { new MenuItemSD(    "SDCard", callBackExec<CBImageViewer>)
+                 , new MenuItemSPIFFS("SPIFFS", callBackExec<CBImageViewer>)
                  } )
 #ifndef ARDUINO_ODROID_ESP32
                , new MenuItem("Power", vmi

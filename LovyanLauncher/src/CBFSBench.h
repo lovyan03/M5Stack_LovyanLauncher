@@ -93,27 +93,26 @@ protected:
     M5.Lcd.setTextColor(0xFFFF);
 
     int loop = 20;
-    M5.Lcd.drawRightString(String(int((uint64_t)1000000 / getCreateTime(   tmpFile, loop)), DEC) + " count/s", 100, 180, 2);
-    M5.Lcd.drawRightString(String(int((uint64_t)1000000 / getOpenCloseTime(tmpFile, loop)), DEC) + " count/s", 200, 180, 2);
-    M5.Lcd.drawRightString(String(int((uint64_t)1000000 / getRemoveTime(   tmpFile, loop)), DEC) + " count/s", 300, 180, 2);
+    M5.Lcd.drawRightString(String(int((uint64_t)1000000 / getCreateTime(   getFS(), tmpFile, loop)), DEC) + " count/s", 100, 180, 2);
+    M5.Lcd.drawRightString(String(int((uint64_t)1000000 / getOpenCloseTime(getFS(), tmpFile, loop)), DEC) + " count/s", 200, 180, 2);
+    M5.Lcd.drawRightString(String(int((uint64_t)1000000 / getRemoveTime(   getFS(), tmpFile, loop)), DEC) + " count/s", 300, 180, 2);
     M5.Lcd.drawString("Complete.", 10, 200, 2);
   }
 
   void drawResult(int y, const String& filepath, int kib, int loop)
   {
     M5.Lcd.drawRightString(getStrSize(1024 * kib), 100, y, 2);
-    M5.Lcd.drawRightString(String(int(1000000 * kib / getWriteTime(filepath, 1024 * kib, loop)), DEC) + " KiB/s", 200, y, 2);
-    M5.Lcd.drawRightString(String(int(1000000 * kib / getReadTime( filepath, 1024 * kib, loop)), DEC) + " KiB/s", 300, y, 2);
+    M5.Lcd.drawRightString(String(int(1000000 * kib / getWriteTime(getFS(), filepath, 1024 * kib, loop)), DEC) + " KiB/s", 200, y, 2);
+    M5.Lcd.drawRightString(String(int(1000000 * kib / getReadTime( getFS(), filepath, 1024 * kib, loop)), DEC) + " KiB/s", 300, y, 2);
   }
 
 
-  volatile uint64_t getWriteTime(const String& filepath, long filesize, int loop) {
-    fs::FS& fs = getFS();
+  uint64_t getWriteTime(fs::FS& fs, const String& filepath, long filesize, int loop) volatile {
     File f;
     uint64_t res = 0;
     uint8_t buf[SPI_FLASH_SEC_SIZE];
     for (int i = 0; i < SPI_FLASH_SEC_SIZE; ++i) { buf[i] = uint8_t(i & 0xFF); }
-    for ( int i = 0; i < loop; ++i) {
+    for (int i = 0; i < loop; ++i) {
       long rest = filesize;
       uint64_t start = micros();
       f = fs.open(filepath + String(i), FILE_WRITE);
@@ -129,8 +128,7 @@ protected:
     return res / loop;
   }
 
-  volatile uint64_t getReadTime(const String& filepath, long filesize, int loop) {
-    fs::FS& fs = getFS();
+  uint64_t getReadTime(fs::FS& fs, const String& filepath, long filesize, int loop) volatile {
     File f;
     uint64_t res = 0;
     uint8_t buf[SPI_FLASH_SEC_SIZE];
@@ -150,8 +148,7 @@ protected:
     return res / loop;
   }
 
-  volatile uint64_t getCreateTime(const String& filepath, int loop) {
-    fs::FS& fs = getFS();
+  uint64_t getCreateTime(fs::FS& fs, const String& filepath, int loop) volatile {
     uint64_t start = micros();
     for ( int i = 0; i < loop; ++i) {
       fs.open(filepath + String(i), FILE_WRITE).close();
@@ -159,8 +156,7 @@ protected:
     return (micros() - start) / loop;
   }
 
-  volatile uint64_t getOpenCloseTime(const String& filepath, int loop) {
-    fs::FS& fs = getFS();
+  uint64_t getOpenCloseTime(fs::FS& fs, const String& filepath, int loop) volatile {
     uint64_t start = micros();
     for ( int i = 0; i < loop; ++i) {
       fs.open(filepath + String(i), FILE_READ).close();
@@ -168,9 +164,7 @@ protected:
     return (micros() - start) / loop;
   }
 
-  volatile uint64_t getRemoveTime(const String& filepath, int loop)
-  {
-    fs::FS& fs = getFS();
+  uint64_t getRemoveTime(fs::FS& fs, const String& filepath, int loop) volatile {
     uint64_t start = micros();
     for (int i = 0; i < loop; ++i) {
       fs.remove(filepath + String(i));

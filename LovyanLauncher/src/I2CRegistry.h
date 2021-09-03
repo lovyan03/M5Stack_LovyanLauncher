@@ -66,7 +66,7 @@ public:
 
     M5.Lcd.setTextFont(1);
     M5.Lcd.setTextSize(1);
-    bool enabled;
+    bool enabled = false;
     for (byte row = 0; row < regMax/16; ++row) {
       for (byte col = 0; col < 16; ++col) {
         if ((col % step) == 0) {
@@ -74,7 +74,6 @@ public:
           Wire.write(row * 16 + col);
           enabled = (Wire.endTransmission(false) == 0 && Wire.requestFrom(addr, (uint8_t)(step ? step:16)));
         }
-        int reg = col + row * 16;
         int x = 20 + col * 19;
         int y = 42 + row * 14;
         uint16_t color = 0;
